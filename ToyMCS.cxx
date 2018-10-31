@@ -1,6 +1,6 @@
 // Created on 10/31/2018
 // by Wenqiang Gu (wgu@bnl.gov)
-// to compile it standalone: g++ MCS.cxx -o MCS.exe `root-config --cflags --libs`
+// to compile it standalone: g++ ToyMCS.cxx -o ToyMCS.exe `root-config --cflags --libs`
 
 #include <iostream>
 #include <vector>
