@@ -31,7 +31,7 @@ WireCell::Eloss::Eloss(int flag, TString filename){
   //for (Int_t i=0;i!=132;i++){
     infile >> temp_TE >> temp >> temp >> temp_dEdx_rho >> temp >> temp >> temp;
     temp_TE *= units::MeV;
-    //    temp_dEdx_rho = ;
+    temp_dEdx_rho *= units::MeV/units::g * pow(units::cm,2);
     beta = sqrt(1-pow(mass_p/(mass_p+temp_TE),2));
     TE.push_back(mass_pi/sqrt(1-beta*beta)-mass_pi);
     dEdx_rho.push_back(temp_dEdx_rho*rho_lar);
