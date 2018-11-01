@@ -30,6 +30,8 @@ WireCell::Eloss::Eloss(int flag, TString filename){
   while(!infile.eof()){
   //for (Int_t i=0;i!=132;i++){
     infile >> temp_TE >> temp >> temp >> temp_dEdx_rho >> temp >> temp >> temp;
+    temp_TE *= units::MeV;
+    //    temp_dEdx_rho = ;
     beta = sqrt(1-pow(mass_p/(mass_p+temp_TE),2));
     TE.push_back(mass_pi/sqrt(1-beta*beta)-mass_pi);
     dEdx_rho.push_back(temp_dEdx_rho*rho_lar);
@@ -46,4 +48,10 @@ WireCell::Eloss::Eloss(int flag, TString filename){
 
 WireCell::Eloss::~Eloss(){
   delete g1;
+}
+
+double WireCell::Eloss::get_mean_dEdx(double T){
+  if (T > TE.at(TE.size()-1))
+    T = TE.at(TE.size()-1);
+  return g1->Eval(T);
 }

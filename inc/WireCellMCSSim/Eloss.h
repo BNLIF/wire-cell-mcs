@@ -13,6 +13,8 @@ namespace WireCell {
     
     ~Eloss();
 
+    double get_mean_dEdx(double T);
+    
   protected:
     double mass_p;
     double rho_lar;
