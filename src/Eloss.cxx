@@ -1,6 +1,7 @@
 #include "WireCellMCSSim/Eloss.h"
 
 #include <fstream>
+#include <iostream>
 
 using namespace WireCell;
 
@@ -27,8 +28,8 @@ WireCell::Eloss::Eloss(int flag, TString filename){
   std::ifstream infile(filename);
   double temp,beta;
   double temp_TE, temp_dEdx_rho;
-  while(!infile.eof()){
-  //for (Int_t i=0;i!=132;i++){
+  //while(!infile.eof()){
+  for (Int_t i=0;i!=132;i++){
     infile >> temp_TE >> temp >> temp >> temp_dEdx_rho >> temp >> temp >> temp;
     temp_TE *= units::MeV;
     temp_dEdx_rho *= units::MeV/units::g * pow(units::cm,2);
@@ -41,7 +42,8 @@ WireCell::Eloss::Eloss(int flag, TString filename){
     x[i] = TE.at(i);
     y[i] = dEdx_rho.at(i);
   }
-  int ncount = TE.size()-1;
+  int ncount = TE.size();
+  //std::cout << ncount << std::endl;
   g1 = new TGraph(ncount,x,y);
   
 }
