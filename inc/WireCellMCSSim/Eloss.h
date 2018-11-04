@@ -13,7 +13,8 @@ namespace WireCell {
     
     ~Eloss();
 
-    double get_mean_dEdx(double T);
+    double get_mean_ioniz_dEdx(double T);
+    double get_mean_total_dEdx(double T);
     
   protected:
     double mass_p;
@@ -24,7 +25,8 @@ namespace WireCell {
 
     std::vector<double> TE;
     std::vector<double> dEdx_rho;
-    TGraph *g1;
+    TGraph *g1; // ionization energy loss
+    TGraph *g2; // total energy loss
   };
   
 };
