@@ -42,30 +42,36 @@ int main(int argc, char* argv[])
   TTree *T_k = new TTree("T_k","T_k");
   
   Double_t Ekin, Lstop, dEodx;
+  Double_t dEodx_MPV;
   T_ele->Branch("T",&Ekin,"T/D");
   T_ele->Branch("L",&Lstop,"L/D");
   T_ele->Branch("dEodx",&dEodx,"dEodx/D");
+  T_ele->Branch("dEodx_MPV",&dEodx_MPV,"dEodx_MPV/D");
   T_ele->SetDirectory(file);
 
   T_pi->Branch("T",&Ekin,"T/D");
   T_pi->Branch("L",&Lstop,"L/D");
   T_pi->Branch("dEodx",&dEodx,"dEodx/D");
+  T_pi->Branch("dEodx_MPV",&dEodx_MPV,"dEodx_MPV/D");
   T_pi->SetDirectory(file);
 
   
   T_p->Branch("T",&Ekin,"T/D");
   T_p->Branch("L",&Lstop,"L/D");
   T_p->Branch("dEodx",&dEodx,"dEodx/D");
+  T_p->Branch("dEodx_MPV",&dEodx_MPV,"dEodx_MPV/D");
   T_p->SetDirectory(file);
 
   T_k->Branch("T",&Ekin,"T/D");
   T_k->Branch("L",&Lstop,"L/D");
   T_k->Branch("dEodx",&dEodx,"dEodx/D");
+  T_k->Branch("dEodx_MPV",&dEodx_MPV,"dEodx_MPV/D");
   T_k->SetDirectory(file);
 
   T_mu->Branch("T",&Ekin,"T/D");
   T_mu->Branch("L",&Lstop,"L/D");
   T_mu->Branch("dEodx",&dEodx,"dEodx/D");
+  T_mu->Branch("dEodx_MPV",&dEodx_MPV,"dEodx_MPV/D");
   T_mu->SetDirectory(file);
   
   Eloss ele_eloss(5,"input_data_files/electron_argon.dat");
@@ -78,7 +84,9 @@ int main(int argc, char* argv[])
   for(int i=0;i!=60*50000;i++){
     Double_t dE = 1./50000.; // MeV
     
-    dEodx = ele_eloss.get_mean_ioniz_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx = ele_eloss.get_mean_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx_MPV = ele_eloss.get_MPV_dEdx(Ekin*units::MeV,3*units::mm)/ units::MeV * units::cm ;
+    
     double dEodx_all = ele_eloss.get_mean_total_dEdx(Ekin*units::MeV) / units::MeV * units::cm;
     Lstop += dE/dEodx_all ;
     if (i%5000==0)
@@ -96,7 +104,8 @@ int main(int argc, char* argv[])
     Lstop = 0;
   for(int i=0;i!=200*5000;i++){
     Double_t dE = 1./5000.; // MeV
-    dEodx = prot_eloss.get_mean_ioniz_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx = prot_eloss.get_mean_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx_MPV = prot_eloss.get_MPV_dEdx(Ekin*units::MeV,3*units::mm)/ units::MeV * units::cm ;
     double dEodx_all = prot_eloss.get_mean_total_dEdx(Ekin*units::MeV) / units::MeV * units::cm;
     Lstop += dE/dEodx_all ;
     if (i%500==0)
@@ -109,7 +118,8 @@ int main(int argc, char* argv[])
     Lstop = 0;
   for(int i=0;i!=200*5000;i++){
     Double_t dE = 1./5000.; // MeV
-    dEodx = kaon_eloss.get_mean_ioniz_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx = kaon_eloss.get_mean_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx_MPV = kaon_eloss.get_MPV_dEdx(Ekin*units::MeV,3*units::mm)/ units::MeV * units::cm ;
     double dEodx_all = kaon_eloss.get_mean_total_dEdx(Ekin*units::MeV) / units::MeV * units::cm;
     Lstop += dE/dEodx_all ;
     if (i%500==0)
@@ -122,7 +132,8 @@ int main(int argc, char* argv[])
     Lstop = 0;
   for(int i=0;i!=200*5000;i++){
     Double_t dE = 1./5000.; // MeV
-    dEodx = pion_eloss.get_mean_ioniz_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx = pion_eloss.get_mean_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx_MPV = pion_eloss.get_MPV_dEdx(Ekin*units::MeV,3*units::mm)/ units::MeV * units::cm ;
     double dEodx_all = pion_eloss.get_mean_total_dEdx(Ekin*units::MeV) / units::MeV * units::cm;
     Lstop += dE/dEodx_all ;
     if (i%500==0)
@@ -135,7 +146,8 @@ int main(int argc, char* argv[])
     Lstop = 0;
   for(int i=0;i!=200*5000;i++){
     Double_t dE = 1./5000.; // MeV
-    dEodx = muon_eloss.get_mean_ioniz_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx = muon_eloss.get_mean_dEdx(Ekin*units::MeV) / units::MeV * units::cm ;
+    dEodx_MPV = muon_eloss.get_MPV_dEdx(Ekin*units::MeV,3*units::mm)/ units::MeV * units::cm ;
     double dEodx_all = muon_eloss.get_mean_total_dEdx(Ekin*units::MeV) / units::MeV * units::cm;
     Lstop += dE/dEodx_all ;
     if (i%500==0)
