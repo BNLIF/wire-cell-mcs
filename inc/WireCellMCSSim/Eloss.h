@@ -15,13 +15,24 @@ namespace WireCell {
 
     double get_mean_ioniz_dEdx(double T);
     double get_mean_total_dEdx(double T);
+    double get_MPV_dEdx(double T, double dx=0.3*units::cm);
+    double get_mean_dEdx(double T, double tcut=0);
+    
+    
+    double Density(double temperature);
+    
     
   protected:
+    int flag;
     double mass_p;
     double rho_lar;
+    double fTemperature;
+    double fZ, fA, fI, fSa, fSk, fSx0, fSx1, fScbar;
+    double K, me;
+    double fRadiationLength;
     
-    double mass_pi;
-    double pi_lifetime;
+    double mass;
+    double lifetime;
 
     std::vector<double> TE;
     std::vector<double> dEdx_rho;
