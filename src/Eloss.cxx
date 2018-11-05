@@ -1,5 +1,7 @@
 #include "WireCellMCSSim/Eloss.h"
 
+#include "TF1.h"
+
 #include <fstream>
 #include <iostream>
 
@@ -14,6 +16,7 @@ double WireCell::Eloss::Density(double temperature){
   double density = (-0.00615*temperature/units::kelvin + 1.928)*units::g/pow(units::cm,3);
   return density;
 }
+
 
 WireCell::Eloss::Eloss(int flag, TString filename)
   : flag(flag)
@@ -31,6 +34,8 @@ WireCell::Eloss::Eloss(int flag, TString filename)
   , me(0.510998918*units::MeV)
   , fRadiationLength(19.55*units::g/pow(units::cm,2)) 
 {
+  gRandom->SetSeed(0);
+  
   rho_lar = Density(fTemperature);//1.396 * units::g/pow(units::cm,3);
 
   if (flag!=5){
@@ -97,6 +102,52 @@ WireCell::Eloss::~Eloss(){
   delete g1;
   delete g2;
 }
+
+double WireCell::Eloss::get_dEdx(double T, double dx){
+  double totE = T + mass;
+  double mom = sqrt(pow(totE,2)-pow(mass,2));
+  
+  double bg = mom / mass;           // beta*gamma.
+  double gamma = sqrt(1. + bg*bg);  // gamma.
+  double beta = bg / gamma;         // beta (velocity).
+  double mer = me / mass;   // electron mass / mass of incident particle.
+  double tmax = 2.*me* bg*bg / (1. + 2.*gamma*mer + mer*mer);  // Maximum delta ray energy (MeV).
+  
+  double cosi = K/2. * fZ / fA /pow(beta,2) * dx * rho_lar;
+
+  double kepa = cosi/tmax;
+
+
+  
+  //std::cout << cosi/units::MeV << " " << tmax/units::MeV << " " << kepa << std::endl;
+  
+
+  double dEdx=0;
+  double gammap = 0.422784;
+  //double gamma = 0.577215;
+  double dEdx_ave = get_mean_dEdx(T); 
+
+  if (kepa < 0.01){
+    // Landau distribution
+    double lambda = gRandom->Landau(0,1);
+    dEdx = cosi*(lambda + log(kepa) + pow(beta,2)+gammap)/dx + dEdx_ave;
+  }else if (kepa>=0.01 && kepa < 10){
+    // Vavilov distribution
+    TF1 f1("f1","TMath::Vavilov(x,[0],[1])",-5,40);
+    f1.SetParameter(0,kepa);
+    f1.SetParameter(1,beta*beta);
+    double lambda = f1.GetRandom();
+    dEdx = cosi*(lambda+log(kepa) + gammap + beta*beta)/dx + dEdx_ave;
+  }else if (kepa >=10){
+    // Gaussian distribution
+    double sigma2 = cosi*tmax*(1-beta*beta/2.)/dx/dx;
+    dEdx = gRandom->Gaus(dEdx_ave, sqrt(sigma2));
+  }
+
+  
+  return dEdx;
+}
+
 
 double WireCell::Eloss::get_MPV_dEdx(double T, double dx){
   double totE = T + mass;

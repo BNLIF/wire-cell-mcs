@@ -3,6 +3,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TH1F.h"
 
 
 #include <iostream>
@@ -17,8 +18,10 @@ int main(int argc, char* argv[])
 {
   Eloss cal_eloss(4); // pion, kaon, muon, proton, electron
 
-  std::cout << cal_eloss.get_mean_ioniz_dEdx(100*units::MeV) / units::MeV * units::cm << " MeV/cm " << cal_eloss.get_MPV_dEdx(100*units::MeV, 0.3*units::cm)/ units::MeV * units::cm << " " << cal_eloss.get_mean_dEdx(100*units::MeV, 0)/units::MeV * units::cm << std::endl;
+  std::cout << cal_eloss.get_mean_ioniz_dEdx(100*units::MeV) / units::MeV * units::cm << " MeV/cm " << cal_eloss.get_MPV_dEdx(100*units::MeV, 0.03*units::cm)/ units::MeV * units::cm << " " << cal_eloss.get_mean_dEdx(100*units::MeV, 0)/units::MeV * units::cm << std::endl;
 
+  std::cout << cal_eloss.get_dEdx(100*units::MeV,0.03*units::cm)/ units::MeV * units::cm << std::endl;
+  
   LAr lar;
   //  std::cout << lar.Ldensity(89) << std::endl;
 
@@ -40,6 +43,12 @@ int main(int argc, char* argv[])
   TTree *T_mu = new TTree("T_mu","T_mu");
   TTree *T_p = new TTree("T_p","T_p");
   TTree *T_k = new TTree("T_k","T_k");
+
+  TH1F *h1 = new TH1F("h1","h1",2000,0,20);
+  h1->SetDirectory(file);
+  for (int i=0;i!=10000;i++){
+    h1->Fill( cal_eloss.get_dEdx(100*units::MeV,30*units::cm)/ units::MeV * units::cm);
+  }
   
   Double_t Ekin, Lstop, dEodx;
   Double_t dEodx_MPV;
@@ -54,7 +63,6 @@ int main(int argc, char* argv[])
   T_pi->Branch("dEodx",&dEodx,"dEodx/D");
   T_pi->Branch("dEodx_MPV",&dEodx_MPV,"dEodx_MPV/D");
   T_pi->SetDirectory(file);
-
   
   T_p->Branch("T",&Ekin,"T/D");
   T_p->Branch("L",&Lstop,"L/D");

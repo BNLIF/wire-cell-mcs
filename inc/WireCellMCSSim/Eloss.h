@@ -5,6 +5,7 @@
 
 #include "TString.h"
 #include "TGraph.h"
+#include "TRandom.h"
 
 namespace WireCell {
   class Eloss {
@@ -17,7 +18,9 @@ namespace WireCell {
     double get_mean_total_dEdx(double T);
     double get_MPV_dEdx(double T, double dx=0.3*units::cm);
     double get_mean_dEdx(double T, double tcut=0);
-    
+
+    // add random 
+    double get_dEdx(double T, double dx=0.3*units::cm);
     
     double Density(double temperature);
     
