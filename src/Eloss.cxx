@@ -103,6 +103,28 @@ WireCell::Eloss::~Eloss(){
   delete g2;
 }
 
+double WireCell::Eloss::get_mom(double T){
+  double totE = T + mass;
+  double mom = sqrt(pow(totE,2)-pow(mass,2));
+  return mom;
+}
+
+double WireCell::Eloss::get_kepa(double T, double dx){
+  double totE = T + mass;
+  double mom = sqrt(pow(totE,2)-pow(mass,2));
+  
+  double bg = mom / mass;           // beta*gamma.
+  double gamma = sqrt(1. + bg*bg);  // gamma.
+  double beta = bg / gamma;         // beta (velocity).
+  double mer = me / mass;   // electron mass / mass of incident particle.
+  double tmax = 2.*me* bg*bg / (1. + 2.*gamma*mer + mer*mer);  // Maximum delta ray energy (MeV).
+  
+  double cosi = K/2. * fZ / fA /pow(beta,2) * dx * rho_lar;
+
+  double kepa = cosi/tmax;
+  return kepa;
+}
+
 double WireCell::Eloss::get_dEdx(double T, double dx){
   double totE = T + mass;
   double mom = sqrt(pow(totE,2)-pow(mass,2));

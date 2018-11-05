@@ -23,7 +23,9 @@ namespace WireCell {
     double get_dEdx(double T, double dx=0.3*units::cm);
     
     double Density(double temperature);
-    
+
+    double get_mom(double T);
+    double get_kepa(double T, double dx = 0.3*units::cm);
     
   protected:
     int flag;

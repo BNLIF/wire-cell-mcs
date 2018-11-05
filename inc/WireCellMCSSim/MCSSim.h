@@ -37,6 +37,8 @@ namespace WireCell {
   void RotateUz(TVector3& direction, TVector3& v1);
 
   void MultiScattSim(MCStrack& atrack, int N, std::vector<double> initpos, std::vector<double> initdir);
+
+  void LineTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size);
   
 };
 
