@@ -31,9 +31,9 @@ int main(){
   TVector3 dir_init(0.4,0.4,0.4);
   dir_init *= 1./dir_init.Mag();
 
-  double step_size = 0.1*units::mm;
+  double step_size = 0.1*units::cm;
 
-  LineTrackSim(atrack, particle_type, T_init, pos_init, dir_init, step_size);
+  MCSTrackSim(atrack, particle_type, T_init, pos_init, dir_init, step_size);
 
   // make out file ...
   std::ofstream outfile("mcssim.json");

@@ -69,13 +69,41 @@ void WireCell::MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, T
     double charge = 0;
     
     double dEdx = cal_loss.get_dEdx(T_init, step_size); // MeV
-    T_init -= dEdx * step_size;
     charge = dEdx * step_size / (23.6 * units::eV) * lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm);
     // std::cout << T_init/units::MeV << " " << dEdx / (units::MeV/units::cm) << " " << lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm) << " " << charge << std::endl;
     atrack.Q.push_back(charge);
-    pos_init.SetXYZ(pos_init.X() - dir_init.X() * step_size,
-		    pos_init.Y() - dir_init.Y() * step_size,
-		    pos_init.Z() - dir_init.Z() * step_size);
+
+    // four random number for multiple scattering ... 
+    double z1= gRandom->Gaus(0,1);
+    double z2= gRandom->Gaus(0,1);
+    double z3= gRandom->Gaus(0,1);
+    double z4= gRandom->Gaus(0,1);
+
+    // average MCS angle ...
+    double theta = cal_loss.get_mcs_angle(T_init, step_size);
+
+    // std::cout << T_init/units::MeV << " " << theta << std::endl;
+    
+    double dz = step_size;
+    double dx = z1* step_size * theta/std::sqrt(12) + z2* step_size* theta*0.5;
+    double dy = z3 *step_size * theta/std::sqrt(12) + z4* step_size* theta*0.5;
+
+    double thetaX = z2 * theta;
+    double thetaY = z4 * theta;
+
+    TVector3 v1(dx,dy,dz); // position ...
+    TVector3 v2(tan(thetaX), tan(thetaY), 1); // angle ...
+
+    RotateUz(dir_init,v1);
+    pos_init.SetXYZ(pos_init.X() + v1.X(),
+		    pos_init.Y() + v1.Y(),
+		    pos_init.Z() + v1.Z());
+    
+    RotateUz(dir_init,v2);
+    dir_init = v2.Unit();
+    
+    T_init -= dEdx * step_size;
+        
     atrack.N ++;
   }
 
