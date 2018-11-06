@@ -16,11 +16,13 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-  Eloss cal_eloss(4); // pion, kaon, muon, proton, electron
+  Eloss cal_eloss(1); // pion, kaon, muon, proton, electron
 
   std::cout << cal_eloss.get_mean_ioniz_dEdx(100*units::MeV) / units::MeV * units::cm << " MeV/cm " << cal_eloss.get_MPV_dEdx(100*units::MeV, 0.03*units::cm)/ units::MeV * units::cm << " " << cal_eloss.get_mean_dEdx(100*units::MeV, 0)/units::MeV * units::cm << std::endl;
 
   std::cout << cal_eloss.get_dEdx(100*units::MeV,0.03*units::cm)/ units::MeV * units::cm << std::endl;
+  
+  std::cout << "MCS angle: " << cal_eloss.get_mcs_angle(100*units::MeV,0.3*units::cm) << std::endl;
   
   LAr lar;
   //  std::cout << lar.Ldensity(89) << std::endl;

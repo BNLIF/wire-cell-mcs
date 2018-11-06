@@ -18,6 +18,7 @@ double WireCell::Eloss::Density(double temperature){
 }
 
 
+
 WireCell::Eloss::Eloss(int flag, TString filename)
   : flag(flag)
   , mass_p(938.272*units::MeV)
@@ -124,6 +125,20 @@ double WireCell::Eloss::get_kepa(double T, double dx){
   double kepa = cosi/tmax;
   return kepa;
 }
+
+double WireCell::Eloss::get_mcs_angle(double T, double dx){
+  double totE = T + mass;
+  double mom = sqrt(pow(totE,2)-pow(mass,2));
+  
+  double bg = mom / mass;           // beta*gamma.
+  double gamma = sqrt(1. + bg*bg);  // gamma.
+  double beta = bg / gamma;         // beta (velocity).
+
+  double theta;
+  theta = 13.6*units::MeV/beta/mom*sqrt(dx*rho_lar/fRadiationLength)*(1+0.038*log(dx*rho_lar/fRadiationLength/pow(beta,2)));
+  return theta;
+}
+
 
 double WireCell::Eloss::get_dEdx(double T, double dx){
   double totE = T + mass;
