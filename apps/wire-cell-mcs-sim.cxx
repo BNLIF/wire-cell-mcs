@@ -35,6 +35,15 @@ int main(){
 
   MCSTrackSim(atrack, particle_type, T_init, pos_init, dir_init, step_size);
 
+  TFile* ofile = new TFile("mcs-tracks.root","RECREATE");
+  TTree* T = new TTree("T","tracks and vertices");
+  T->Branch("N", &atrack.N, "N/I");
+  T->Branch("x", &atrack.x);
+  T->Branch("y", &atrack.y);
+  T->Branch("z", &atrack.z);
+  T->Branch("Q", &atrack.Q);
+  T->SetDirectory(ofile);
+  
   // make out file ...
   std::ofstream outfile("mcssim.json");
   outfile << "{" << std::endl;
@@ -52,14 +61,24 @@ int main(){
     outfile << "   \"z\": " << atrack.z.at(i)/units::mm  << std::endl;
 
     outfile << "  }," << std::endl;
+    
+    atrack.y.at(i)/=units::cm;
+    atrack.x.at(i)/=units::cm;
+    atrack.z.at(i)/=units::cm;
+    
+    
   }
 
+  
   outfile << "  {" << std::endl;
   outfile << "  }" << std::endl;
   outfile << " ]" << std::endl;
   outfile << "}" << std::endl;
   outfile.close();
 
+  T->Fill();
+  T->Write();
+  ofile->Close();
   
   // TFile* ofile = new TFile("mcs-tracks.root","RECREATE");
   // TTree* T = new TTree("T","tracks and vertices");
