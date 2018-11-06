@@ -46,7 +46,12 @@ void compare_traj(){
   for (int i=0;i!=T_rec->GetEntries();i++){
     T_rec->GetEntry(i);
 
-    //  x1 -= 1; // need to move 1 cm???
+    // binning effect 1 us later from the binned slice effect, rebinned 4 ...
+    // speed of imaging 1.101 mm / us
+    // speed of simulation 1.098 mm/us
+    // there is a potential 1 us offset at SP
+    // -0.6 cm is the distance difference between Y and U planes
+    x1 = (x1+0.1101*2)/1.1009999*1.098-0.6;//+ 4*0.1101; 
     
     g2_xy->SetPoint(i,x1,y1);
     g2_xz->SetPoint(i,x1,z1);
