@@ -46,6 +46,43 @@ void WireCell::LineTrackSim(MCStrack& atrack, int particle_type, double T_init, 
   std::cout << atrack.N << std::endl;
 }
 
+void WireCell::MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
+  Eloss cal_loss(particle_type); // only for other particles ...
+
+  LAr lar;
+
+  // proper normalize ... 
+  atrack.N = 0;
+  dir_init *= 1./dir_init.Mag();
+
+   while (T_init >0){
+    atrack.x.push_back(pos_init.X());
+    atrack.y.push_back(pos_init.Y());
+    atrack.z.push_back(pos_init.Z());
+
+    atrack.vx.push_back(dir_init.X());
+    atrack.vy.push_back(dir_init.Y());
+    atrack.vz.push_back(dir_init.Z());
+
+    atrack.p.push_back(cal_loss.get_mom(T_init));
+    // get charge ...
+    double charge = 0;
+    
+    double dEdx = cal_loss.get_dEdx(T_init, step_size); // MeV
+    T_init -= dEdx * step_size;
+    charge = dEdx * step_size / (23.6 * units::eV) * lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm);
+    // std::cout << T_init/units::MeV << " " << dEdx / (units::MeV/units::cm) << " " << lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm) << " " << charge << std::endl;
+    atrack.Q.push_back(charge);
+    pos_init.SetXYZ(pos_init.X() - dir_init.X() * step_size,
+		    pos_init.Y() - dir_init.Y() * step_size,
+		    pos_init.Z() - dir_init.Z() * step_size);
+    atrack.N ++;
+  }
+
+  std::cout << atrack.N << std::endl;
+  
+}
+
    
 void WireCell::MultiScattSim(MCStrack& atrack, int N, std::vector<double> initpos, std::vector<double> initdir){
   atrack.clear();

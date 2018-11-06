@@ -38,6 +38,8 @@ namespace WireCell {
 
   void MultiScattSim(MCStrack& atrack, int N, std::vector<double> initpos, std::vector<double> initdir);
 
+  void MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size);
+
   void LineTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size);
   
 };
