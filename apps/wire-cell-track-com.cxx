@@ -126,12 +126,16 @@ int main(int argc, char* argv[])
   double total_dis2=0; // total distance^2
   double total_L = 0;
   int Npoints = 0;
+  double total_dtheta = 0;
+  double max_dtheta = 0;
   t1->Branch("max_dis",&max_dis);
   t1->Branch("beg_dis",&beg_dis);
   t1->Branch("end_dis",&end_dis);
   t1->Branch("total_dis2",&total_dis2);
   t1->Branch("total_L",&total_L);
   t1->Branch("N",&Npoints);
+  t1->Branch("total_dtheta",&total_dtheta);
+  t1->Branch("max_dtheta",&max_dtheta);
   
   std::vector<double> *x2 = new std::vector<double>;
   std::vector<double> *y2 = new std::vector<double>;
@@ -266,6 +270,9 @@ int main(int argc, char* argv[])
 		      z2_pair->at(i-1) - z2_pair->at(i));
 	dtheta->push_back((dir1.Angle(dir2)+dir3.Angle(dir4))/2.);
       }
+      if (dtheta->back() > max_dtheta)
+	max_dtheta = dtheta->back();
+      total_dtheta += dtheta->back();
     }
   }else{
     dtheta->push_back(0);
