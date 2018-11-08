@@ -1,3 +1,6 @@
+
+#include "WireCellData/ToyPointCloud.h"
+
 #include <iostream>
 #include <vector>
 
@@ -8,10 +11,11 @@
 
 #include "TGraph.h"
 #include "TGraph2D.h"
+#include "TVector3.h"
 
 
 
-//using namespace WireCell;
+using namespace WireCell;
 
 int main(int argc, char* argv[])
 {
@@ -74,13 +78,23 @@ int main(int argc, char* argv[])
 
   TGraph2D *g1 = new TGraph2D();
 
+  ToyPointCloud pcloud;
+
+  WireCell::PointVector ps;
+  
   for (size_t i=0;i!=x->size();i++){
     g1_xy->SetPoint(i,x->at(i),y->at(i));
     g1_xz->SetPoint(i,x->at(i),z->at(i));
     g1_yz->SetPoint(i,y->at(i),z->at(i));
 
+    Point p(x->at(i)*units::cm,y->at(i)*units::cm,z->at(i)*units::cm);
+    ps.push_back(p);
+    
     g1->SetPoint(i,x->at(i),y->at(i),z->at(i));
   }
+  pcloud.AddPoints(ps);
+  pcloud.build_kdtree_index();
+  
   g1_xy->SetLineColor(1);
   g1_xz->SetLineColor(1);
   g1_yz->SetLineColor(1);
@@ -103,10 +117,58 @@ int main(int argc, char* argv[])
   TGraph *g2_yz = new TGraph();
 
   TGraph2D *g2 = new TGraph2D();
+
+  TTree *t1 = new TTree("T","T");
+  t1->SetDirectory(file);
+  double max_dis=0; // maximum distance along the track 
+  double beg_dis; // distance at the beginning ... 
+  double end_dis; // distance at the end ...
+  double total_dis2=0; // total distance^2
+  double total_L = 0;
+  int Npoints = 0;
+  t1->Branch("max_dis",&max_dis);
+  t1->Branch("beg_dis",&beg_dis);
+  t1->Branch("end_dis",&end_dis);
+  t1->Branch("total_dis2",&total_dis2);
+  t1->Branch("total_L",&total_L);
+  t1->Branch("N",&Npoints);
+  
+  std::vector<double> *x2 = new std::vector<double>;
+  std::vector<double> *y2 = new std::vector<double>;
+  std::vector<double> *z2 = new std::vector<double>;
+  
+  std::vector<double> *x2_pair = new std::vector<double>;
+  std::vector<double> *y2_pair = new std::vector<double>;
+  std::vector<double> *z2_pair = new std::vector<double>;
+
+  std::vector<double> *dis = new std::vector<double>;
+  std::vector<double> *L = new std::vector<double>;
+  std::vector<double> *dtheta = new std::vector<double>;
+  
+  t1->Branch("x",&x2);
+  t1->Branch("y",&y2);
+  t1->Branch("z",&z2);
+  
+  t1->Branch("x_pair",&x2_pair);
+  t1->Branch("y_pair",&y2_pair);
+  t1->Branch("z_pair",&z2_pair);
+
+  t1->Branch("dis",&dis);
+  t1->Branch("L",&L);
+  t1->Branch("dtheta",&dtheta);
+
+  double temp_L = 0;
+  double prev_x1, prev_y1, prev_z1;
+
+  Npoints = T_rec->GetEntries();
   
   for (int i=0;i!=T_rec->GetEntries();i++){
     T_rec->GetEntry(i);
 
+    if (i!=0){
+      temp_L += sqrt(pow(x1-prev_x1,2)+pow(y1-prev_y1,2)+pow(z1-prev_z1,2));
+    }
+    
     // binning effect 1 us later from the binned slice effect, rebinned 4 ...
     // speed of imaging 1.101 mm / us
     // speed of simulation 1.098 mm/us
@@ -118,10 +180,101 @@ int main(int argc, char* argv[])
     g2_xz->SetPoint(i,x1,z1);
     g2_yz->SetPoint(i,y1,z1);
 
+    Point p(x1*units::cm, y1*units::cm, z1*units::cm);
+    std::pair<double, Point> point_pair = pcloud.get_closest_point(p);
+
+    x2->push_back(x1);
+    y2->push_back(y1);
+    z2->push_back(z1);
+
+    dis->push_back(point_pair.first/units::cm);
+
+    x2_pair->push_back(point_pair.second.x/units::cm);
+    y2_pair->push_back(point_pair.second.y/units::cm);
+    z2_pair->push_back(point_pair.second.z/units::cm);
+    
+    L->push_back(temp_L);
+    
+    if (max_dis < point_pair.first/units::cm)
+      max_dis = point_pair.first/units::cm;
+    total_dis2 += pow(point_pair.first/units::cm,2);
+
+    if (i==0){
+      double dis1 = pow(x1-x->front(),2) + pow(y1-y->front(),2) + pow(z1-z->front(),2);
+      double dis2 = pow(x1-x->back(),2) + pow(y1-y->back(),2) + pow(z1-z->back(),2);
+      
+      //std::cout << sqrt(dis1)/units::cm << " " << sqrt(dis2)/units::cm << std::endl;
+      if (dis1 < dis2){
+	beg_dis = sqrt(dis1);
+      }else{
+	beg_dis = sqrt(dis2);
+      }
+    }
+    if (i==T_rec->GetEntries()-1){
+      double dis1 = pow(x1-x->front(),2) + pow(y1-y->front(),2) + pow(z1-z->front(),2);
+      double dis2 = pow(x1-x->back(),2) + pow(y1-y->back(),2) + pow(z1-z->back(),2);
+      if (dis1 < dis2){
+	end_dis = sqrt(dis1);
+      }else{
+	end_dis = sqrt(dis2);
+      }
+    }
+    
+
+    
+    //  std::cout << point_pair.first/units::cm << " " << point_pair.second.x/units::cm << " " << point_pair.second.y/units::cm << " " << point_pair.second.z/units::cm << std::endl;
+    
     g2->SetPoint(i,x1,y1,z1);
+
+    prev_x1 = x1;
+    prev_y1 = y1;
+    prev_z1 = z1;
     
   }
 
+  if (x2->size()>1){
+    for (size_t i=0;i!=x2->size();i++){
+      if (i==0){
+	TVector3 dir1(x2->at(1)-x2->at(0),
+		      y2->at(1)-y2->at(0),
+		      z2->at(1)-z2->at(0));
+	TVector3 dir2(x2_pair->at(1) - x2_pair->at(0),
+		      y2_pair->at(1) - y2_pair->at(0),
+		      z2_pair->at(1) - z2_pair->at(0));
+	dtheta->push_back(dir1.Angle(dir2));
+      }else if(i==x2->size()-1){
+	TVector3 dir1(x2->at(x2->size()-1) - x2->at(x2->size()-2),
+		      y2->at(x2->size()-1) - y2->at(x2->size()-2),
+		      z2->at(x2->size()-1) - z2->at(x2->size()-2));
+	TVector3 dir2(x2_pair->at(x2->size()-1) - x2_pair->at(x2->size()-2),
+		      y2_pair->at(x2->size()-1) - y2_pair->at(x2->size()-2),
+		      z2_pair->at(x2->size()-1) - z2_pair->at(x2->size()-2));
+	dtheta->push_back(dir1.Angle(dir2));
+      }else{
+	TVector3 dir1(x2->at(i+1)-x2->at(i),
+		      y2->at(i+1)-y2->at(i),
+		      z2->at(i+1)-z2->at(i));
+	TVector3 dir2(x2_pair->at(i+1) - x2_pair->at(i),
+		      y2_pair->at(i+1) - y2_pair->at(i),
+		      z2_pair->at(i+1) - z2_pair->at(i));
+
+	TVector3 dir3(x2->at(i-1)-x2->at(i),
+		      y2->at(i-1)-y2->at(i),
+		      z2->at(i-1)-z2->at(i));
+	TVector3 dir4(x2_pair->at(i-1) - x2_pair->at(i),
+		      y2_pair->at(i-1) - y2_pair->at(i),
+		      z2_pair->at(i-1) - z2_pair->at(i));
+	dtheta->push_back((dir1.Angle(dir2)+dir3.Angle(dir4))/2.);
+      }
+    }
+  }else{
+    dtheta->push_back(0);
+  }
+  
+  total_L = temp_L;
+  
+  t1->Fill();
+  
   g2_xy->SetLineColor(2);
   g2_xz->SetLineColor(2);
   g2_yz->SetLineColor(2);
@@ -167,9 +320,11 @@ int main(int argc, char* argv[])
   
   g1->Write("gt_3D");
   g2->Write("gr_3D");
+  t1->Write();
+  
 
-  T_true->CloneTree(-1,"fast");
-  T_rec->CloneTree(-1,"fast");
+  // T_true->CloneTree(-1,"fast");
+  // T_rec->CloneTree(-1,"fast");
   
   file->Write();
   file->Close();
