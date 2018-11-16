@@ -35,8 +35,8 @@ int main(){
 
   double step_size = 0.01*units::cm;
 
-  //MCSTrackSim(atrack, particle_type, T_init, pos_init, dir_init, step_size);
-  LineToyTrackSim(atrack,  pos_init, dir_init, 30, step_size, 5000);
+  MCSTrackSim(atrack, particle_type, T_init, pos_init, dir_init, step_size);
+  //LineToyTrackSim(atrack,  pos_init, dir_init, 30, step_size, 5000);
 
   TFile* ofile = new TFile("mcs-tracks.root","RECREATE");
   TTree* T = new TTree("T","tracks and vertices");

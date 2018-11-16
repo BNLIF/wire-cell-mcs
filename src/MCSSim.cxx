@@ -14,6 +14,9 @@ void WireCell::MCS::RotateUz(TVector3& direction, TVector3& v1){
 }
 
 void WireCell::MCS::LineToyTrackSim(MCStrack& atrack, TVector3 pos_init, TVector3 dir_init, int nstep, double step_size, int charge){
+
+  dir_init = dir_init.Unit();
+  
   atrack.N = 0;
   for (int i=0;i!=nstep;i++){
     atrack.x.push_back(pos_init.X());
