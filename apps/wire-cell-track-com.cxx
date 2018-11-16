@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
     // speed of simulation 1.098 mm/us
     // there is a potential 1 us offset at SP
     // -0.6 cm is the distance difference between Y and U planes
-    x1 = (x1+0.1101*2)/1.1009999*1.098-0.6;//+ 4*0.1101; 
+    x1 = (x1+0.1101)/1.1009999*1.098-0.6;//+ 4*0.1101; 
     
     g2_xy->SetPoint(i,x1,y1);
     g2_xz->SetPoint(i,x1,z1);
