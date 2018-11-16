@@ -6,12 +6,36 @@
 
 using namespace WireCell;
 
-void WireCell::RotateUz(TVector3& direction, TVector3& v1){
+using namespace MCS;
+
+void WireCell::MCS::RotateUz(TVector3& direction, TVector3& v1){
   TVector3 unit = direction.Unit();
   v1.RotateUz(unit); 
 }
 
-void WireCell::LineTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
+void WireCell::MCS::LineToyTrackSim(MCStrack& atrack, TVector3 pos_init, TVector3 dir_init, int nstep, double step_size, int charge){
+  atrack.N = 0;
+  for (int i=0;i!=nstep;i++){
+    atrack.x.push_back(pos_init.X());
+    atrack.y.push_back(pos_init.Y());
+    atrack.z.push_back(pos_init.Z());
+
+    atrack.vx.push_back(dir_init.X());
+    atrack.vy.push_back(dir_init.Y());
+    atrack.vz.push_back(dir_init.Z());
+
+    atrack.p.push_back(charge);
+
+    atrack.Q.push_back(charge);
+    pos_init.SetXYZ(pos_init.X() - dir_init.X() * step_size,
+		    pos_init.Y() - dir_init.Y() * step_size,
+		    pos_init.Z() - dir_init.Z() * step_size);
+    atrack.N ++;
+  }
+}
+
+
+void WireCell::MCS::LineTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
   Eloss cal_loss(particle_type); // only for other particles ...
   LAr lar;
 
@@ -46,7 +70,7 @@ void WireCell::LineTrackSim(MCStrack& atrack, int particle_type, double T_init, 
   std::cout << atrack.N << std::endl;
 }
 
-void WireCell::MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
+void WireCell::MCS::MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
   Eloss cal_loss(particle_type); // only for other particles ...
 
   LAr lar;
@@ -112,7 +136,7 @@ void WireCell::MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, T
 }
 
    
-void WireCell::MultiScattSim(MCStrack& atrack, int N, std::vector<double> initpos, std::vector<double> initdir){
+void WireCell::MCS::MultiScattSim(MCStrack& atrack, int N, std::vector<double> initpos, std::vector<double> initdir){
   atrack.clear();
   double x=0;
   double y=0;
