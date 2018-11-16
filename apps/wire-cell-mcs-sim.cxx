@@ -33,7 +33,7 @@ int main(){
   TVector3 dir_init(0.4,0.4,0.4);
   dir_init *= 1./dir_init.Mag();
 
-  double step_size = 0.01*units::cm;
+  double step_size = 0.1*units::cm;
 
   MCSTrackSim(atrack, particle_type, T_init, pos_init, dir_init, step_size);
   //LineToyTrackSim(atrack,  pos_init, dir_init, 30, step_size, 5000);
