@@ -66,6 +66,9 @@ void compare_traj(){
   std::vector<double> *x2 = new std::vector<double>;
   std::vector<double> *y2 = new std::vector<double>;
   std::vector<double> *z2 = new std::vector<double>;
+  std::vector<double> *dQ_rec = new std::vector<double>;
+  std::vector<double> *dQ_tru = new std::vector<double>;
+  std::vector<double> *dx = new std::vector<double>;
   
   std::vector<double> *x2_pair = new std::vector<double>;
   std::vector<double> *y2_pair = new std::vector<double>;
@@ -78,6 +81,9 @@ void compare_traj(){
   t1->SetBranchAddress("x",&x2);
   t1->SetBranchAddress("y",&y2);
   t1->SetBranchAddress("z",&z2);
+  t1->SetBranchAddress("dQ_rec",&dQ_rec);
+  t1->SetBranchAddress("dQ_tru",&dQ_tru);
+  t1->SetBranchAddress("dx",&dx);
   
   t1->SetBranchAddress("x_pair",&x2_pair);
   t1->SetBranchAddress("y_pair",&y2_pair);
@@ -123,8 +129,8 @@ void compare_traj(){
 
  
   
-  TCanvas *c1 = new TCanvas("c1","c1",1200,800);
-  c1->Divide(3,2);
+  TCanvas *c1 = new TCanvas("c1","c1",1600,800);
+  c1->Divide(4,2);
   c1->cd(1);
   g1->Draw("AP");
   g2->Draw("Psame");
@@ -160,7 +166,7 @@ void compare_traj(){
   p1->SetMarkerColor(4);
   p1->SetMarkerSize(2);
   //  T_true->Draw("y:z");
-  c1->cd(4);
+  c1->cd(5);
   g1_xz->Draw("AL");
   g1_xz->GetXaxis()->SetTitle("X (cm)");
   g1_xz->GetYaxis()->SetTitle("Z (cm)");
@@ -171,7 +177,7 @@ void compare_traj(){
   p2->SetMarkerColor(4);
   p2->SetMarkerSize(2);
   //T_rec->Draw("y:z");
-  c1->cd(5);
+  c1->cd(6);
   g1_yz->Draw("AL");
   g1_yz->GetXaxis()->SetTitle("Y (cm)");
   g1_yz->GetYaxis()->SetTitle("Z (cm)");
@@ -201,7 +207,7 @@ void compare_traj(){
   gd->GetXaxis()->SetTitle("Track Length (cm)");
   gd->GetYaxis()->SetTitle("distance (cm)");
   
-  c1->cd(6);
+  c1->cd(4);
   //T->Draw("dtheta:L");
   TGraph *gt = new TGraph();
   for (size_t i=0;i!=dtheta->size();i++){
@@ -211,4 +217,22 @@ void compare_traj(){
   gt->SetMarkerStyle(20);
   gt->GetXaxis()->SetTitle("Track Length (cm)");
   gt->GetYaxis()->SetTitle("angle (deg)");
+
+  c1->cd(7);
+  TGraph *g_dQdx = new TGraph();
+  TGraph *g_dQdx1 = new TGraph();
+  for (size_t i=0;i!=dx->size();i++){
+    g_dQdx->SetPoint(i,L->at(i),dQ_rec->at(i)/dx->at(i));
+    g_dQdx1->SetPoint(i,L->at(i),dQ_tru->at(i)/dx->at(i));
+  }
+  g_dQdx->Draw("APL");
+  g_dQdx1->Draw("Psame");
+  g_dQdx1->SetMarkerStyle(25);
+  g_dQdx1->SetMarkerColor(1);
+  g_dQdx->SetMarkerColor(2);
+  g_dQdx->SetLineColor(2);
+  g_dQdx->SetMarkerStyle(20);
+  g_dQdx->GetXaxis()->SetTitle("Track Length (cm)");
+  g_dQdx->GetYaxis()->SetTitle("dQ/dx (e/cm)");
+  
 }

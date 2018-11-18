@@ -13,7 +13,7 @@
 #include "TGraph2D.h"
 #include "TVector3.h"
 
-
+#include <map>
 
 using namespace WireCell;
 
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 
   TGraph2D *g1 = new TGraph2D();
 
-  ToyPointCloud pcloud;
+  ToyPointCloud pcloud, pcloud1;
 
   WireCell::PointVector ps;
   
@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
   }
   pcloud.AddPoints(ps);
   pcloud.build_kdtree_index();
+  ps.clear();
   
   g1_xy->SetLineColor(1);
   g1_xz->SetLineColor(1);
@@ -109,9 +110,12 @@ int main(int argc, char* argv[])
   TChain *T_rec = new TChain(reco_treename,reco_treename);
   T_rec->Add(reco_filename);
   Double_t x1,y1,z1;
+  Double_t dQ1,dx1;
   T_rec->SetBranchAddress("x",&x1);
   T_rec->SetBranchAddress("y",&y1);
   T_rec->SetBranchAddress("z",&z1);
+  T_rec->SetBranchAddress("q",&dQ1);
+  T_rec->SetBranchAddress("nq",&dx1);
   TGraph *g2_xy = new TGraph();
   TGraph *g2_xz = new TGraph();
   TGraph *g2_yz = new TGraph();
@@ -140,6 +144,9 @@ int main(int argc, char* argv[])
   std::vector<double> *x2 = new std::vector<double>;
   std::vector<double> *y2 = new std::vector<double>;
   std::vector<double> *z2 = new std::vector<double>;
+  std::vector<double> *dQ_rec = new std::vector<double>;
+  std::vector<double> *dQ_tru = new std::vector<double>;
+  std::vector<double> *dx = new std::vector<double>;
   
   std::vector<double> *x2_pair = new std::vector<double>;
   std::vector<double> *y2_pair = new std::vector<double>;
@@ -152,6 +159,9 @@ int main(int argc, char* argv[])
   t1->Branch("x",&x2);
   t1->Branch("y",&y2);
   t1->Branch("z",&z2);
+  t1->Branch("dQ_rec",&dQ_rec);
+  t1->Branch("dQ_tru",&dQ_tru);
+  t1->Branch("dx",&dx);
   
   t1->Branch("x_pair",&x2_pair);
   t1->Branch("y_pair",&y2_pair);
@@ -165,10 +175,13 @@ int main(int argc, char* argv[])
   double prev_x1, prev_y1, prev_z1;
 
   Npoints = T_rec->GetEntries();
+
+  std::map<std::tuple<int,int,int>, int> map_point_index;
   
   for (int i=0;i!=T_rec->GetEntries();i++){
     T_rec->GetEntry(i);
-
+    
+    
     if (i!=0){
       temp_L += sqrt(pow(x1-prev_x1,2)+pow(y1-prev_y1,2)+pow(z1-prev_z1,2));
     }
@@ -185,12 +198,18 @@ int main(int argc, char* argv[])
     g2_yz->SetPoint(i,y1,z1);
 
     Point p(x1*units::cm, y1*units::cm, z1*units::cm);
+    ps.push_back(p);
+
     std::pair<double, Point> point_pair = pcloud.get_closest_point(p);
 
+    map_point_index[std::make_tuple(p.x/(0.01*units::mm),p.y/(0.01*units::mm),p.z/(0.01*units::mm))] = x2->size();
+    
     x2->push_back(x1);
     y2->push_back(y1);
     z2->push_back(z1);
-
+    dQ_rec->push_back(dQ1);
+    dQ_tru->push_back(0);
+    dx->push_back(dx1);
     dis->push_back(point_pair.first/units::cm);
 
     x2_pair->push_back(point_pair.second.x/units::cm);
@@ -235,6 +254,20 @@ int main(int argc, char* argv[])
     prev_z1 = z1;
     
   }
+  
+  pcloud1.AddPoints(ps);
+  pcloud1.build_kdtree_index();
+
+   for (size_t i=0;i!=x->size();i++){
+     Point p(x->at(i)*units::cm,y->at(i)*units::cm,z->at(i)*units::cm);
+     std::pair<double, Point> point_pair = pcloud1.get_closest_point(p);
+     int index = map_point_index[std::make_tuple(int(point_pair.second.x/(0.01*units::mm))
+						 ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))];
+     //std::cout << index << std::endl;
+     dQ_tru->at(index) += Q->at(i);
+     // g1->SetPoint(i,x->at(i),y->at(i),z->at(i));
+  }
+  
 
   if (x2->size()>1){
     for (size_t i=0;i!=x2->size();i++){
