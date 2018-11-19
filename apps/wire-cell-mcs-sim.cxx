@@ -26,7 +26,7 @@ int main(){
 
   // particle type ...
   // 1: pi, 2 kaon, 3 muon, 4 proton 5, electron
-  int particle_type = 3;
+  int particle_type = 5;
 
   double T_init = 100*units::MeV; // initial kinetic energy
   TVector3 pos_init(1.5*units::m,30*units::cm,6*units::m);
