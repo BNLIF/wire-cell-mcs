@@ -265,6 +265,10 @@ int main(int argc, char* argv[])
 						 ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))];
      //std::cout << index << std::endl;
      dQ_tru->at(index) += Q->at(i);
+
+     if (i==0 || i==x->size()-1)
+       std::cout << p << " " << sqrt(pow(p.x-point_pair.second.x,2)+pow(p.y-point_pair.second.y,2)+pow(p.z-point_pair.second.z,2))/units::cm << std::endl;
+     
      // g1->SetPoint(i,x->at(i),y->at(i),z->at(i));
   }
   
