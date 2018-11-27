@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
     vx->push_back(*x);
     vy->push_back(*y);
     vz->push_back(*z);
+    vQ->push_back(*Q);
     
     t2->Branch("N",&vN);
     t2->Branch("x",&vx);
@@ -243,84 +244,122 @@ int main(int argc, char* argv[])
   
   for (int i=0;i!=T_rec->GetEntries();i++){
     T_rec->GetEntry(i);
-    
-    
-    // if (i!=0){
-    //   temp_L += sqrt(pow(x1-prev_x1,2)+pow(y1-prev_y1,2)+pow(z1-prev_z1,2));
-    // }
-    
-    // // binning effect 1 us later from the binned slice effect, rebinned 4 ...
-    // // speed of imaging 1.101 mm / us
-    // // speed of simulation 1.098 mm/us
-    // // there is a potential 1 us offset at SP
-    // // -0.6 cm is the distance difference between Y and U planes
-    // //    x1 = (x1+0.1101)/1.1009999*1.098-0.6;//+ 4*0.1101; 
-    
-    // Point p(x1*units::cm, y1*units::cm, z1*units::cm);
-    // ps.push_back(p);
+    if (std::round(ndf)!=prev_cluster_id){
+      Npoints->push_back(0);
+      total_L->push_back(0);
 
+      std::vector<double> temp_dQ_tru;
+      dQ_tru->push_back(temp_dQ_tru);
+      std::vector<double> temp_dis;
+      dis->push_back(temp_dis);
+      std::vector<double> temp_x2_pair;
+      x2_pair->push_back(temp_x2_pair);
+      std::vector<double> temp_y2_pair;
+      y2_pair->push_back(temp_y2_pair);
+      std::vector<double> temp_z2_pair;
+      z2_pair->push_back(temp_z2_pair);
 
-   
+      std::vector<double> temp_x2;
+      x2->push_back(temp_x2);
+      std::vector<double> temp_y2;
+      y2->push_back(temp_y2);
+      std::vector<double> temp_z2;
+      z2->push_back(temp_z2);
+      std::vector<double> temp_rec_pu;
+      rec_pu->push_back(temp_rec_pu);
+      std::vector<double> temp_rec_pv;
+      rec_pv->push_back(temp_rec_pv);
+      std::vector<double> temp_rec_pw;
+      rec_pw->push_back(temp_rec_pw);
+      std::vector<double> temp_rec_pt;
+      rec_pt->push_back(temp_rec_pt);
+      cluster_id->push_back(std::round(ndf));
+      std::vector<double> temp_dQ_rec;
+      dQ_rec->push_back(temp_dQ_rec);
+      std::vector<double> temp_dx;
+      dx->push_back(temp_dx);
+      std::vector<double> temp_L;
+      L->push_back(temp_L);
+
+      
+      max_dis->push_back(0);
+      total_dis2->push_back(0);
+    }
+    Npoints->back()++;
     
-    // if (file_type==1){
-    //   std::pair<double, Point> point_pair = pcloud.get_closest_point(p);
-    //   map_point_index[std::make_tuple(p.x/(0.01*units::mm),p.y/(0.01*units::mm),p.z/(0.01*units::mm))] = x2->size();
-    //   dQ_tru->push_back(0);
-    //   dis->push_back(point_pair.first/units::cm);
+    if (Npoints->back()!=1){
+      total_L->back() += sqrt(pow(x1-prev_x1,2)+pow(y1-prev_y1,2)+pow(z1-prev_z1,2));
+    }
+    
+    // binning effect 1 us later from the binned slice effect, rebinned 4 ...
+    // speed of imaging 1.101 mm / us
+    // speed of simulation 1.098 mm/us
+    // there is a potential 1 us offset at SP
+    // -0.6 cm is the distance difference between Y and U planes
+    //    x1 = (x1+0.1101)/1.1009999*1.098-0.6;//+ 4*0.1101; 
+    Point p(x1*units::cm, y1*units::cm, z1*units::cm);
+    ps.push_back(p);
+    
+    
+    if (file_type==1){
+      std::pair<double, Point> point_pair = pcloud.get_closest_point(p);
+      map_point_index[std::make_tuple(p.x/(0.01*units::mm),p.y/(0.01*units::mm),p.z/(0.01*units::mm))] = x2->back().size();
+      dQ_tru->back().push_back(0);
+      dis->back().push_back(point_pair.first/units::cm);
+      
 
-    //   x2_pair->push_back(point_pair.second.x/units::cm);
-    //   y2_pair->push_back(point_pair.second.y/units::cm);
-    //   z2_pair->push_back(point_pair.second.z/units::cm);
+      x2_pair->back().push_back(point_pair.second.x/units::cm);
+      y2_pair->back().push_back(point_pair.second.y/units::cm);
+      z2_pair->back().push_back(point_pair.second.z/units::cm);
         
-    //   if (max_dis < point_pair.first/units::cm)
-    // 	max_dis = point_pair.first/units::cm;
-    //   total_dis2 += pow(point_pair.first/units::cm,2);
+      if (max_dis->back() < point_pair.first/units::cm)
+     	max_dis->back() = point_pair.first/units::cm;
+      total_dis2->back() += pow(point_pair.first/units::cm,2);
 
-    //   if (i==0){
-    // 	double dis1 = pow(x1-x->front(),2) + pow(y1-y->front(),2) + pow(z1-z->front(),2);
-    // 	double dis2 = pow(x1-x->back(),2) + pow(y1-y->back(),2) + pow(z1-z->back(),2);
+      if (Npoints->back()==1){
+     	double dis1 = pow(x1-x->front(),2) + pow(y1-y->front(),2) + pow(z1-z->front(),2);
+     	double dis2 = pow(x1-x->back(),2) + pow(y1-y->back(),2) + pow(z1-z->back(),2);
       
     // 	//std::cout << sqrt(dis1)/units::cm << " " << sqrt(dis2)/units::cm << std::endl;
-    // 	if (dis1 < dis2){
-    // 	  beg_dis = sqrt(dis1);
-    // 	}else{
-    // 	  beg_dis = sqrt(dis2);
-    // 	}
-    //   }
-    //   if (i==T_rec->GetEntries()-1){
-    // 	double dis1 = pow(x1-x->front(),2) + pow(y1-y->front(),2) + pow(z1-z->front(),2);
-    // 	double dis2 = pow(x1-x->back(),2) + pow(y1-y->back(),2) + pow(z1-z->back(),2);
-    // 	if (dis1 < dis2){
-    // 	  end_dis = sqrt(dis1);
-    // 	}else{
-    // 	  end_dis = sqrt(dis2);
-    // 	}
-    //   }
-    // }
+     	if (dis1 < dis2){
+     	  beg_dis->push_back(sqrt(dis1));
+     	}else{
+	  beg_dis->push_back(sqrt(dis2));
+     	}
+	end_dis->push_back(0);
+      }
+    //   if (i==T_rec->GetEntries()-1)
+      {
+     	double dis1 = pow(x1-x->front(),2) + pow(y1-y->front(),2) + pow(z1-z->front(),2);
+     	double dis2 = pow(x1-x->back(),2) + pow(y1-y->back(),2) + pow(z1-z->back(),2);
+     	if (dis1 < dis2){
+     	  end_dis->back() = sqrt(dis1);
+     	}else{
+     	  end_dis->back() = sqrt(dis2);
+     	}
+      }
+    }
 
-    // x2->push_back(x1);
-    // y2->push_back(y1);
-    // z2->push_back(z1);
-    // rec_pu->push_back(pu);
-    // rec_pv->push_back(pv);
-    // rec_pw->push_back(pw);
-    // rec_pt->push_back(pt);
-    // cluster_id->push_back(std::round(ndf));
-    // dQ_rec->push_back(dQ1);
-    // dx->push_back(dx1);
-    // L->push_back(temp_L);
+    x2->back().push_back(x1);
+    y2->back().push_back(y1);
+    z2->back().push_back(z1);
+    rec_pu->back().push_back(pu);
+    rec_pv->back().push_back(pv);
+    rec_pw->back().push_back(pw);
+    rec_pt->back().push_back(pt);
+    dQ_rec->back().push_back(dQ1);
+    dx->back().push_back(dx1);
+    L->back().push_back(total_L->back());
     
     
-    //  std::cout << point_pair.first/units::cm << " " << point_pair.second.x/units::cm << " " << point_pair.second.y/units::cm << " " << point_pair.second.z/units::cm << std::endl;
-    
-    //  g2->SetPoint(i,x1,y1,z1);
+  
 
     prev_x1 = x1;
     prev_y1 = y1;
     prev_z1 = z1;
     prev_cluster_id = std::round(ndf);
   }
-  //total_L = temp_L;
+  
   
   pcloud1.AddPoints(ps);
   pcloud1.build_kdtree_index();
@@ -328,66 +367,72 @@ int main(int argc, char* argv[])
 
 
   
-  // if (file_type==1){
-  //   for (size_t i=0;i!=x->size();i++){
-  //     Point p(x->at(i)*units::cm,y->at(i)*units::cm,z->at(i)*units::cm);
-  //     std::pair<double, Point> point_pair = pcloud1.get_closest_point(p);
-  //     int index = map_point_index[std::make_tuple(int(point_pair.second.x/(0.01*units::mm))
-  // 						  ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))];
+  if (file_type==1){
+    for (size_t i=0;i!=x->size();i++){
+      Point p(x->at(i)*units::cm,y->at(i)*units::cm,z->at(i)*units::cm);
+      std::pair<double, Point> point_pair = pcloud1.get_closest_point(p);
+      int index = map_point_index[std::make_tuple(int(point_pair.second.x/(0.01*units::mm))
+  						  ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))];
 
-  //     //      std::cout << index << std::endl;
+      // std::cout << index << std::endl;
 
-  //     dQ_tru->at(index) += Q->at(i);
+      dQ_tru->back().at(index) += Q->at(i);
       
-  //     // if (i==0 || i==x->size()-1)
-  //     //   std::cout << p << " " << sqrt(pow(p.x-point_pair.second.x,2)+pow(p.y-point_pair.second.y,2)+pow(p.z-point_pair.second.z,2))/units::cm << std::endl;
-  //     // g1->SetPoint(i,x->at(i),y->at(i),z->at(i));
-  //   }
+      // if (i==0 || i==x->size()-1)
+      //   std::cout << p << " " << sqrt(pow(p.x-point_pair.second.x,2)+pow(p.y-point_pair.second.y,2)+pow(p.z-point_pair.second.z,2))/units::cm << std::endl;
+      // g1->SetPoint(i,x->at(i),y->at(i),z->at(i));
+    }
 
    
     
-  //   if (x2->size()>1){
-  //     for (size_t i=0;i!=x2->size();i++){
-  // 	if (i==0){
-  // 	  TVector3 dir1(x2->at(1)-x2->at(0),
-  // 			y2->at(1)-y2->at(0),
-  // 			z2->at(1)-z2->at(0));
-  // 	  TVector3 dir2(x2_pair->at(1) - x2_pair->at(0),
-  // 			y2_pair->at(1) - y2_pair->at(0),
-  // 			z2_pair->at(1) - z2_pair->at(0));
-  // 	  dtheta->push_back(dir1.Angle(dir2));
-  // 	}else if(i==x2->size()-1){
-  // 	  TVector3 dir1(x2->at(x2->size()-1) - x2->at(x2->size()-2),
-  // 			y2->at(x2->size()-1) - y2->at(x2->size()-2),
-  // 			z2->at(x2->size()-1) - z2->at(x2->size()-2));
-  // 	  TVector3 dir2(x2_pair->at(x2->size()-1) - x2_pair->at(x2->size()-2),
-  // 			y2_pair->at(x2->size()-1) - y2_pair->at(x2->size()-2),
-  // 			z2_pair->at(x2->size()-1) - z2_pair->at(x2->size()-2));
-  // 	  dtheta->push_back(dir1.Angle(dir2));
-  // 	}else{
-  // 	  TVector3 dir1(x2->at(i+1)-x2->at(i),
-  // 			y2->at(i+1)-y2->at(i),
-  // 			z2->at(i+1)-z2->at(i));
-  // 	  TVector3 dir2(x2_pair->at(i+1) - x2_pair->at(i),
-  // 			y2_pair->at(i+1) - y2_pair->at(i),
-  // 			z2_pair->at(i+1) - z2_pair->at(i));
+    if (x2->back().size()>1){
+      std::vector<double> temp_dtheta;
+      dtheta->push_back(temp_dtheta);
+      max_dtheta->push_back(0);
+      total_dtheta->push_back(0);
+
+      
+      for (size_t i=0;i!=x2->back().size();i++){
+  	if (i==0){
+  	  TVector3 dir1(x2->back().at(1)-x2->back().at(0),
+  			y2->back().at(1)-y2->back().at(0),
+  			z2->back().at(1)-z2->back().at(0));
+  	  TVector3 dir2(x2_pair->back().at(1) - x2_pair->back().at(0),
+  			y2_pair->back().at(1) - y2_pair->back().at(0),
+  			z2_pair->back().at(1) - z2_pair->back().at(0));
+  	  dtheta->back().push_back(dir1.Angle(dir2));
+  	}else if(i==x2->back().size()-1){
+  	  TVector3 dir1(x2->back().at(x2->back().size()-1) - x2->back().at(x2->back().size()-2),
+  			y2->back().at(x2->back().size()-1) - y2->back().at(x2->back().size()-2),
+  			z2->back().at(x2->back().size()-1) - z2->back().at(x2->back().size()-2));
+  	  TVector3 dir2(x2_pair->back().at(x2->back().size()-1) - x2_pair->back().at(x2->back().size()-2),
+  			y2_pair->back().at(x2->back().size()-1) - y2_pair->back().at(x2->back().size()-2),
+  			z2_pair->back().at(x2->back().size()-1) - z2_pair->back().at(x2->back().size()-2));
+  	  dtheta->back().push_back(dir1.Angle(dir2));
+  	}else{
+  	  TVector3 dir1(x2->back().at(i+1)-x2->back().at(i),
+  			y2->back().at(i+1)-y2->back().at(i),
+  			z2->back().at(i+1)-z2->back().at(i));
+  	  TVector3 dir2(x2_pair->back().at(i+1) - x2_pair->back().at(i),
+  			y2_pair->back().at(i+1) - y2_pair->back().at(i),
+  			z2_pair->back().at(i+1) - z2_pair->back().at(i));
 	  
-  // 	  TVector3 dir3(x2->at(i-1)-x2->at(i),
-  // 			y2->at(i-1)-y2->at(i),
-  // 			z2->at(i-1)-z2->at(i));
-  // 	  TVector3 dir4(x2_pair->at(i-1) - x2_pair->at(i),
-  // 			y2_pair->at(i-1) - y2_pair->at(i),
-  // 			z2_pair->at(i-1) - z2_pair->at(i));
-  // 	  dtheta->push_back((dir1.Angle(dir2)+dir3.Angle(dir4))/2.);
-  // 	}
-  // 	if (dtheta->back() > max_dtheta)
-  // 	  max_dtheta = dtheta->back();
-  // 	total_dtheta += dtheta->back();
-  //     }
-  //   }else{
-  //     dtheta->push_back(0);
-  //   }
-  // }
+  	  TVector3 dir3(x2->back().at(i-1)-x2->back().at(i),
+  			y2->back().at(i-1)-y2->back().at(i),
+  			z2->back().at(i-1)-z2->back().at(i));
+  	  TVector3 dir4(x2_pair->back().at(i-1) - x2_pair->back().at(i),
+  			y2_pair->back().at(i-1) - y2_pair->back().at(i),
+  			z2_pair->back().at(i-1) - z2_pair->back().at(i));
+  	  dtheta->back().push_back((dir1.Angle(dir2)+dir3.Angle(dir4))/2.);
+  	}
+  	if (dtheta->back().back() > max_dtheta->back())
+  	  max_dtheta->back() = dtheta->back().back();
+  	total_dtheta->back() += dtheta->back().back();
+      }
+    }else{
+      dtheta->back().push_back(0);
+    }
+  }
   
   
   
