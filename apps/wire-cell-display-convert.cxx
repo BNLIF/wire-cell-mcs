@@ -137,13 +137,18 @@ int main(int argc, char* argv[])
   T_proj->Add(reco_filename);
   Double_t x1,y1,z1;
   Double_t dQ1,dx1,ndf;
+  Double_t pu, pv, pw, pt;
   T_rec->SetBranchAddress("x",&x1);
   T_rec->SetBranchAddress("y",&y1);
   T_rec->SetBranchAddress("z",&z1);
   T_rec->SetBranchAddress("q",&dQ1);
   T_rec->SetBranchAddress("nq",&dx1);
   T_rec->SetBranchAddress("ndf",&ndf);
-
+  T_rec->SetBranchAddress("pu",&pu);
+  T_rec->SetBranchAddress("pv",&pv);
+  T_rec->SetBranchAddress("pw",&pw);
+  T_rec->SetBranchAddress("pt",&pt);
+  
   
   TTree *t1 = new TTree("T_rec","T_rec");
   t1->SetDirectory(file);
@@ -174,6 +179,10 @@ int main(int argc, char* argv[])
   std::vector<double> *dQ_tru = new std::vector<double>;
   std::vector<double> *dx = new std::vector<double>;
   std::vector<int> *cluster_id = new std::vector<int>;
+  std::vector<double> *rec_pu = new std::vector<double>;
+  std::vector<double> *rec_pv = new std::vector<double>;
+  std::vector<double> *rec_pw = new std::vector<double>;
+  std::vector<double> *rec_pt = new std::vector<double>;
   
   std::vector<double> *x2_pair = new std::vector<double>;
   std::vector<double> *y2_pair = new std::vector<double>;
@@ -191,7 +200,12 @@ int main(int argc, char* argv[])
   t1->Branch("rec_dx",&dx);
   t1->Branch("rec_L",&L);
   t1->Branch("rec_cluster_id",&cluster_id);
-
+  t1->Branch("rec_u",&rec_pu);
+  t1->Branch("rec_v",&rec_pv);
+  t1->Branch("rec_w",&rec_pw);
+  t1->Branch("rec_t",&rec_pt);
+  
+  
   if (file_type==1){
     t1->Branch("true_dQ",&dQ_tru);
     t1->Branch("true_x",&x2_pair);
@@ -231,6 +245,10 @@ int main(int argc, char* argv[])
     x2->push_back(x1);
     y2->push_back(y1);
     z2->push_back(z1);
+    rec_pu->push_back(pu);
+    rec_pv->push_back(pv);
+    rec_pw->push_back(pw);
+    rec_pt->push_back(pt);
     cluster_id->push_back(std::round(ndf));
     dQ_rec->push_back(dQ1);
     dx->push_back(dx1);
