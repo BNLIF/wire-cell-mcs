@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   
   TString reco_filename = "tracking_0_0_0.root"; 
   TString reco_treename = "T_rec_charge";
-  TString proj_treename = "T_proj";
+  TString proj_treename = "T_proj_data";
   
   TString truth_filename = "mcs-tracks.root"; 
   TString truth_treename = "T";
@@ -132,8 +132,10 @@ int main(int argc, char* argv[])
   // g1->SetLineWidth(2);
 
   TChain *T_rec = new TChain(reco_treename,reco_treename);
-  TChain *T_proj = new TChain(proj_treename,proj_treename);
+  TChain *T_proj_data = new TChain(proj_treename,proj_treename);
+  TChain *T_proj = new TChain("T_proj","T_proj");
   T_rec->Add(reco_filename);
+  T_proj_data->Add(reco_filename);
   T_proj->Add(reco_filename);
   Double_t x1,y1,z1;
   Double_t dQ1,dx1,ndf;
@@ -414,6 +416,7 @@ int main(int argc, char* argv[])
   // t2->Write();
 
   //T_true->CloneTree(-1,"fast");
+  T_proj_data->CloneTree(-1,"fast");
   T_proj->CloneTree(-1,"fast");
   
   file->Write();
