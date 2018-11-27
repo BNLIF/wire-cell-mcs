@@ -89,6 +89,9 @@ int main(int argc, char* argv[])
     t2->Branch("Q",&Q);
     t2->Fill();
   }
+
+  
+  
   //std::cout << N << std::endl;
 
   // TGraph *g1_xy = new TGraph();
@@ -119,6 +122,7 @@ int main(int argc, char* argv[])
   }
   
   ps.clear();
+  
   
   // g1_xy->SetLineColor(1);
   // g1_xz->SetLineColor(1);
@@ -244,17 +248,7 @@ int main(int argc, char* argv[])
     ps.push_back(p);
 
 
-    x2->push_back(x1);
-    y2->push_back(y1);
-    z2->push_back(z1);
-    rec_pu->push_back(pu);
-    rec_pv->push_back(pv);
-    rec_pw->push_back(pw);
-    rec_pt->push_back(pt);
-    cluster_id->push_back(std::round(ndf));
-    dQ_rec->push_back(dQ1);
-    dx->push_back(dx1);
-    L->push_back(temp_L);
+   
     
     if (file_type==1){
       std::pair<double, Point> point_pair = pcloud.get_closest_point(p);
@@ -292,6 +286,18 @@ int main(int argc, char* argv[])
       }
     }
 
+     x2->push_back(x1);
+    y2->push_back(y1);
+    z2->push_back(z1);
+    rec_pu->push_back(pu);
+    rec_pv->push_back(pv);
+    rec_pw->push_back(pw);
+    rec_pt->push_back(pt);
+    cluster_id->push_back(std::round(ndf));
+    dQ_rec->push_back(dQ1);
+    dx->push_back(dx1);
+    L->push_back(temp_L);
+    
     
     //  std::cout << point_pair.first/units::cm << " " << point_pair.second.x/units::cm << " " << point_pair.second.y/units::cm << " " << point_pair.second.z/units::cm << std::endl;
     
@@ -306,20 +312,27 @@ int main(int argc, char* argv[])
   pcloud1.AddPoints(ps);
   pcloud1.build_kdtree_index();
 
+
+
+  
   if (file_type==1){
     for (size_t i=0;i!=x->size();i++){
       Point p(x->at(i)*units::cm,y->at(i)*units::cm,z->at(i)*units::cm);
       std::pair<double, Point> point_pair = pcloud1.get_closest_point(p);
       int index = map_point_index[std::make_tuple(int(point_pair.second.x/(0.01*units::mm))
 						  ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))];
-      //std::cout << index << std::endl;
+
+      //      std::cout << index << std::endl;
+
       dQ_tru->at(index) += Q->at(i);
       
       // if (i==0 || i==x->size()-1)
       //   std::cout << p << " " << sqrt(pow(p.x-point_pair.second.x,2)+pow(p.y-point_pair.second.y,2)+pow(p.z-point_pair.second.z,2))/units::cm << std::endl;
       // g1->SetPoint(i,x->at(i),y->at(i),z->at(i));
     }
-  
+
+   
+    
     if (x2->size()>1){
       for (size_t i=0;i!=x2->size();i++){
 	if (i==0){
