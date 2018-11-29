@@ -33,6 +33,8 @@ int main(int argc, char* argv[])
   TString out_filename = "track_com.root";
 
   int file_type = 1; // 1 for MC and 2 for data ...
+
+ 
   
   for(Int_t i = 1; i != argc; i++){
      switch(argv[i][1]){
@@ -63,8 +65,14 @@ int main(int argc, char* argv[])
     std::cout << reco_filename << " " << reco_treename << std::endl;
   }
 
-  TFile *file = new TFile(out_filename,"RECREATE");
+  TFile *file1 = new TFile(reco_filename);
+  TTree *T_bad_ch = (TTree*)file1->Get("T_bad_ch");
+   
   
+  TFile *file = new TFile(out_filename,"RECREATE");
+  if (T_bad_ch!=0){
+    T_bad_ch->CloneTree()->Write();
+  }
 
   std::vector<std::vector<double> > *vx = new std::vector<std::vector<double> >;
   std::vector<std::vector<double> > *vy = new std::vector<std::vector<double> >;
@@ -150,6 +158,7 @@ int main(int argc, char* argv[])
   TChain *T_rec = new TChain(reco_treename,reco_treename);
   TChain *T_proj_data = new TChain(proj_treename,proj_treename);
   TChain *T_proj = new TChain("T_proj","T_proj");
+  
   T_rec->Add(reco_filename);
   T_proj_data->Add(reco_filename);
   T_proj->Add(reco_filename);
