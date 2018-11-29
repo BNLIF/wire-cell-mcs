@@ -20,7 +20,7 @@ using namespace WireCell;
 int main(int argc, char* argv[])
 {
   if (argc < 2){
-    std::cerr << "usage: wire-cell-track-com -a[truth.root] -b[reco.root] -t[reco_treename] -n[truth_treename] -o[out.root]" << std::endl;
+    std::cerr << "usage: wire-cell-track-com -a[truth.root] -b[reco.root] -t[reco_treename] -n[truth_treename] -o[out.root] -f[1:MC,2:data]" << std::endl;
     return 1;
   }
   
