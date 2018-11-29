@@ -41,6 +41,7 @@ int main(int argc, char* argv[]){
   TVector3 pos_init(1.5*units::m,30*units::cm,6*units::m);
   TVector3 dir_init(0.4,0.4,0.4);
   double step_size = 0.1*units::cm;
+  int ndepo = 20;
   
   for(Int_t i = 1; i != argc; i++){
     switch(argv[i][1]){
@@ -70,6 +71,10 @@ int main(int argc, char* argv[]){
       break;
     case 's':
       step_size = atof(&argv[i][2])*units::cm;
+      break;
+    case 'n':
+      ndepo = atoi(&argv[i][2]);
+      break;
     }
   }
   
@@ -93,7 +98,7 @@ int main(int argc, char* argv[]){
   outfile << "{" << std::endl;
   outfile << " \"depos\": [" << std::endl;
 
-  for (int j=0;j!=50;j++){
+  for (int j=0;j!=ndepo;j++){
     TVector3 pos_gen;
     pos_gen.SetXYZ(pos_init.X()+gRandom->Gaus(0,25*units::cm),
 		   pos_init.Y()+gRandom->Gaus(0,25*units::cm),
