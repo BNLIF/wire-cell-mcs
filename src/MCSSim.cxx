@@ -97,6 +97,7 @@ void WireCell::MCS::MCSTrackSim(MCStrack& atrack, int particle_type, double T_in
     
     double dEdx = cal_loss.get_dEdx(T_init, step_size); // MeV
     charge = dEdx * step_size / (23.6 * units::eV) * lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm);
+    // std::cout << lar.recombine_Birks(1.8*units::MeV/units::cm*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm);
     // std::cout << T_init/units::MeV << " " << dEdx / (units::MeV/units::cm) << " " << lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm) << " " << charge << std::endl;
     atrack.Q.push_back(charge);
 
