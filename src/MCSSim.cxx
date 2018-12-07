@@ -61,8 +61,8 @@ void WireCell::MCS::LineTrackSim(MCStrack& atrack, int particle_type, double T_i
     
     double dEdx = cal_loss.get_dEdx(T_init, step_size); // MeV
     T_init -= dEdx * step_size;
-    charge = dEdx * step_size / (23.6 * units::eV) * lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm);
-    // std::cout << T_init/units::MeV << " " << dEdx / (units::MeV/units::cm) << " " << lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm) << " " << charge << std::endl;
+    charge = dEdx * step_size / (23.6 * units::eV) * lar.recombine_Birks(dEdx,88*units::kelvin,0.273*units::kilovolt/units::cm);
+    // std::cout << T_init/units::MeV << " " << dEdx / (units::MeV/units::cm) << " " << lar.recombine_Birks(dEdx,88*units::kelvin,0.273*units::kilovolt/units::cm) << " " << charge << std::endl;
     atrack.Q.push_back(charge);
     pos_init.SetXYZ(pos_init.X() - dir_init.X() * step_size,
 		    pos_init.Y() - dir_init.Y() * step_size,
@@ -96,9 +96,14 @@ void WireCell::MCS::MCSTrackSim(MCStrack& atrack, int particle_type, double T_in
     double charge = 0;
     
     double dEdx = cal_loss.get_dEdx(T_init, step_size); // MeV
-    charge = dEdx * step_size / (23.6 * units::eV) * lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm);
-    // std::cout << lar.recombine_Birks(1.8*units::MeV/units::cm*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm);
-    // std::cout << T_init/units::MeV << " " << dEdx / (units::MeV/units::cm) << " " << lar.recombine_Birks(dEdx*lar.Ldensity(88*units::kelvin),88*units::kelvin,0.273*units::kilovolt/units::cm) << " " << charge << std::endl;
+
+    
+    
+    charge = dEdx * step_size / (23.6 * units::eV) * lar.recombine_Birks(dEdx,88*units::kelvin,0.273*units::kilovolt/units::cm);
+
+    // std::cout << "haha: " << dEdx / (units::MeV/units::cm) << " " << charge << std::endl;
+    // std::cout << lar.recombine_Birks(1.8*units::MeV/units::cm,88*units::kelvin,0.273*units::kilovolt/units::cm);
+    // std::cout << T_init/units::MeV << " " << dEdx / (units::MeV/units::cm) << " " << lar.recombine_Birks(dEdx,88*units::kelvin,0.273*units::kilovolt/units::cm) << " " << charge << std::endl;
     atrack.Q.push_back(charge);
 
     // four random number for multiple scattering ... 
