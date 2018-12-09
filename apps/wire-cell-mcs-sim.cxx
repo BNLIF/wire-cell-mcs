@@ -39,6 +39,7 @@ int main(int argc, char* argv[]){
   int particle_type = 4;
   double T_init = 100*units::MeV; // initial kinetic energy
   TVector3 pos_init(1.5*units::m,30*units::cm,6*units::m);
+
   TVector3 dir_init(0.4,0.4,0.4);
   double step_size = 0.1*units::cm;
   
