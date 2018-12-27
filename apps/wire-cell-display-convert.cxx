@@ -101,6 +101,10 @@ int main(int argc, char* argv[])
     vy->push_back(*y);
     vz->push_back(*z);
     vQ->push_back(*Q);
+
+    for (size_t i=0;i!=vx->at(0).size();i++){
+      vx->at(0).at(i) = (vx->at(0).at(i)+0.6)/1.098*1.1009999-0.1101;
+    }
     
     t2->Branch("N",&vN);
     t2->Branch("x",&vx);
