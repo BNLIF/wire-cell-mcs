@@ -257,6 +257,8 @@ int main(int argc, char* argv[])
   // Npoints = T_rec->GetEntries();
 
   std::map<std::tuple<int,int,int>, std::pair<int, int> > map_point_index;
+
+  //  std::cout << T_rec->GetEntries() << std::endl;
   
   for (int i=0;i!=T_rec->GetEntries();i++){
     T_rec->GetEntry(i);
@@ -375,6 +377,8 @@ int main(int argc, char* argv[])
     prev_y1 = y1;
     prev_z1 = z1;
     prev_cluster_id = std::round(ndf);
+
+    //std::cout << prev_cluster_id << std::endl;
   } // loop over i ...
   
   
