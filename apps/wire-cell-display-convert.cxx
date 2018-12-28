@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 
   
   
-  //std::cout << N << std::endl;
+  // std::cout << N << std::endl;
 
   // TGraph *g1_xy = new TGraph();
   // TGraph *g1_xz = new TGraph();
@@ -159,6 +159,8 @@ int main(int argc, char* argv[])
   // g1->SetLineColor(1);
   // g1->SetLineWidth(2);
 
+ 
+  
   TChain *T_rec = new TChain(reco_treename,reco_treename);
   TChain *T_proj_data = new TChain(proj_treename,proj_treename);
   TChain *T_proj = new TChain("T_proj","T_proj");
@@ -222,7 +224,8 @@ int main(int argc, char* argv[])
   std::vector<std::vector<double> > *dis = new std::vector<std::vector<double> >;
   std::vector<std::vector<double> > *L = new std::vector<std::vector<double> >;
   std::vector<std::vector<double> > *dtheta = new std::vector<std::vector<double> >;
-  
+
+
   
   t1->Branch("rec_x",&x2);
   t1->Branch("rec_y",&y2);
@@ -253,7 +256,7 @@ int main(int argc, char* argv[])
 
   // Npoints = T_rec->GetEntries();
 
-  std::map<std::tuple<int,int,int>, int> map_point_index;
+  std::map<std::tuple<int,int,int>, std::pair<int, int> > map_point_index;
   
   for (int i=0;i!=T_rec->GetEntries();i++){
     T_rec->GetEntry(i);
@@ -312,11 +315,12 @@ int main(int argc, char* argv[])
     //    x1 = (x1+0.1101)/1.1009999*1.098-0.6;//+ 4*0.1101; 
     Point p(x1*units::cm, y1*units::cm, z1*units::cm);
     ps.push_back(p);
-    
+
+   
     
     if (file_type==1){
       std::pair<double, Point> point_pair = pcloud.get_closest_point(p);
-      map_point_index[std::make_tuple(p.x/(0.01*units::mm),p.y/(0.01*units::mm),p.z/(0.01*units::mm))] = x2->back().size();
+      map_point_index[std::make_tuple(p.x/(0.01*units::mm),p.y/(0.01*units::mm),p.z/(0.01*units::mm))] = std::make_pair(x2->size()-1,x2->back().size());
       dQ_tru->back().push_back(0);
       dis->back().push_back(point_pair.first/units::cm);
       
@@ -371,7 +375,7 @@ int main(int argc, char* argv[])
     prev_y1 = y1;
     prev_z1 = z1;
     prev_cluster_id = std::round(ndf);
-  }
+  } // loop over i ...
   
   
   pcloud1.AddPoints(ps);
@@ -379,79 +383,78 @@ int main(int argc, char* argv[])
 
 
 
-  
+
+  //std::cout << "haha " << std::endl;
   if (file_type==1){
     for (size_t i=0;i!=x->size();i++){
       Point p(x->at(i)*units::cm,y->at(i)*units::cm,z->at(i)*units::cm);
       std::pair<double, Point> point_pair = pcloud1.get_closest_point(p);
       int index = map_point_index[std::make_tuple(int(point_pair.second.x/(0.01*units::mm))
-  						  ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))];
+  						  ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))].second;
+      int index1 = map_point_index[std::make_tuple(int(point_pair.second.x/(0.01*units::mm))
+  						  ,int(point_pair.second.y/(0.01*units::mm)),int(point_pair.second.z/(0.01*units::mm)))].first;
 
-      // std::cout << index << std::endl;
-
-      dQ_tru->back().at(index) += Q->at(i);
+      // std::cout << index << " " << dQ_tru->back().size() << " " << dQ_tru->front().size() << std::endl;
+      if (index <dQ_tru->at(index1).size())
+	dQ_tru->at(index1).at(index) += Q->at(i);
       
       // if (i==0 || i==x->size()-1)
       //   std::cout << p << " " << sqrt(pow(p.x-point_pair.second.x,2)+pow(p.y-point_pair.second.y,2)+pow(p.z-point_pair.second.z,2))/units::cm << std::endl;
       // g1->SetPoint(i,x->at(i),y->at(i),z->at(i));
     }
 
-   
-    
-    if (x2->back().size()>1){
-      std::vector<double> temp_dtheta;
-      dtheta->push_back(temp_dtheta);
-      max_dtheta->push_back(0);
-      total_dtheta->push_back(0);
+    //    std::cout << x2->back().size() << std::endl;
 
-      
-      for (size_t i=0;i!=x2->back().size();i++){
-  	if (i==0){
-  	  TVector3 dir1(x2->back().at(1)-x2->back().at(0),
-  			y2->back().at(1)-y2->back().at(0),
-  			z2->back().at(1)-z2->back().at(0));
-  	  TVector3 dir2(x2_pair->back().at(1) - x2_pair->back().at(0),
-  			y2_pair->back().at(1) - y2_pair->back().at(0),
-  			z2_pair->back().at(1) - z2_pair->back().at(0));
-  	  dtheta->back().push_back(dir1.Angle(dir2));
-  	}else if(i==x2->back().size()-1){
-  	  TVector3 dir1(x2->back().at(x2->back().size()-1) - x2->back().at(x2->back().size()-2),
-  			y2->back().at(x2->back().size()-1) - y2->back().at(x2->back().size()-2),
-  			z2->back().at(x2->back().size()-1) - z2->back().at(x2->back().size()-2));
-  	  TVector3 dir2(x2_pair->back().at(x2->back().size()-1) - x2_pair->back().at(x2->back().size()-2),
-  			y2_pair->back().at(x2->back().size()-1) - y2_pair->back().at(x2->back().size()-2),
-  			z2_pair->back().at(x2->back().size()-1) - z2_pair->back().at(x2->back().size()-2));
-  	  dtheta->back().push_back(dir1.Angle(dir2));
-  	}else{
-  	  TVector3 dir1(x2->back().at(i+1)-x2->back().at(i),
-  			y2->back().at(i+1)-y2->back().at(i),
-  			z2->back().at(i+1)-z2->back().at(i));
-  	  TVector3 dir2(x2_pair->back().at(i+1) - x2_pair->back().at(i),
-  			y2_pair->back().at(i+1) - y2_pair->back().at(i),
-  			z2_pair->back().at(i+1) - z2_pair->back().at(i));
-	  
-  	  TVector3 dir3(x2->back().at(i-1)-x2->back().at(i),
-  			y2->back().at(i-1)-y2->back().at(i),
-  			z2->back().at(i-1)-z2->back().at(i));
-  	  TVector3 dir4(x2_pair->back().at(i-1) - x2_pair->back().at(i),
-  			y2_pair->back().at(i-1) - y2_pair->back().at(i),
-  			z2_pair->back().at(i-1) - z2_pair->back().at(i));
-  	  dtheta->back().push_back((dir1.Angle(dir2)+dir3.Angle(dir4))/2.);
-  	}
-  	if (dtheta->back().back() > max_dtheta->back())
-  	  max_dtheta->back() = dtheta->back().back();
-  	total_dtheta->back() += dtheta->back().back();
+    for (size_t k=0;k!=x2->size();k++){
+      if (x2->at(k).size()>1){
+	std::vector<double> temp_dtheta;
+	dtheta->push_back(temp_dtheta);
+	max_dtheta->push_back(0);
+	total_dtheta->push_back(0);
+	
+	for (size_t i=0;i!=x2->at(k).size();i++){
+	  if (i==0){
+	    TVector3 dir1(x2->at(k).at(1)-x2->at(k).at(0),
+			  y2->at(k).at(1)-y2->at(k).at(0),
+			  z2->at(k).at(1)-z2->at(k).at(0));
+	    TVector3 dir2(x2_pair->at(k).at(1) - x2_pair->at(k).at(0),
+			  y2_pair->at(k).at(1) - y2_pair->at(k).at(0),
+			  z2_pair->at(k).at(1) - z2_pair->at(k).at(0));
+	    dtheta->at(k).push_back(dir1.Angle(dir2));
+	  }else if(i==x2->at(k).size()-1){
+	    TVector3 dir1(x2->at(k).at(x2->at(k).size()-1) - x2->at(k).at(x2->at(k).size()-2),
+			  y2->at(k).at(x2->at(k).size()-1) - y2->at(k).at(x2->at(k).size()-2),
+			  z2->at(k).at(x2->at(k).size()-1) - z2->at(k).at(x2->at(k).size()-2));
+	    TVector3 dir2(x2_pair->at(k).at(x2->at(k).size()-1) - x2_pair->at(k).at(x2->at(k).size()-2),
+			  y2_pair->at(k).at(x2->at(k).size()-1) - y2_pair->at(k).at(x2->at(k).size()-2),
+			  z2_pair->at(k).at(x2->at(k).size()-1) - z2_pair->at(k).at(x2->at(k).size()-2));
+	    dtheta->at(k).push_back(dir1.Angle(dir2));
+	  }else{
+	    TVector3 dir1(x2->at(k).at(i+1)-x2->at(k).at(i),
+			  y2->at(k).at(i+1)-y2->at(k).at(i),
+			  z2->at(k).at(i+1)-z2->at(k).at(i));
+	    TVector3 dir2(x2_pair->at(k).at(i+1) - x2_pair->at(k).at(i),
+			  y2_pair->at(k).at(i+1) - y2_pair->at(k).at(i),
+			  z2_pair->at(k).at(i+1) - z2_pair->at(k).at(i));
+	    
+	    TVector3 dir3(x2->at(k).at(i-1)-x2->at(k).at(i),
+			  y2->at(k).at(i-1)-y2->at(k).at(i),
+			  z2->at(k).at(i-1)-z2->at(k).at(i));
+	    TVector3 dir4(x2_pair->at(k).at(i-1) - x2_pair->at(k).at(i),
+			  y2_pair->at(k).at(i-1) - y2_pair->at(k).at(i),
+			  z2_pair->at(k).at(i-1) - z2_pair->at(k).at(i));
+	    dtheta->at(k).push_back((dir1.Angle(dir2)+dir3.Angle(dir4))/2.);
+	  }
+	  if (dtheta->at(k).back() > max_dtheta->at(k))
+	    max_dtheta->at(k) = dtheta->at(k).back();
+	  total_dtheta->at(k) += dtheta->at(k).back();
+	}
+      }else{
+	dtheta->at(k).push_back(0);
       }
-    }else{
-      dtheta->back().push_back(0);
     }
   }
-  
-  
-  
   t1->Fill();
-  
-
   
   T_proj_data->CloneTree(-1,"fast");
   T_proj->CloneTree(-1,"fast");
