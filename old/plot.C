@@ -13,7 +13,7 @@ void plot(){
   
   TGraph2D* g1 = new TGraph2D();
 
-  for(int I=0; I<50 /*tracks*/; I++){ 
+  for(int I=0; I<100 /*tracks*/; I++){ 
     T->GetEntry(I);
     std::cout << N << " vertices"  << std::endl;
 
