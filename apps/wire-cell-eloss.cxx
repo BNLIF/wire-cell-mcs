@@ -26,9 +26,17 @@ int main(int argc, char* argv[]){
   
   while(T>0){
     double dEdx_MPV = loss.get_MPV_dEdx(T, 3*units::mm);
+    
     double dEdx_mean_ioniz = loss.get_mean_ioniz_dEdx(T);
     double dEdx_mean_total = loss.get_mean_total_dEdx(T);
 
+    double dEdx_mean_dEdx = loss.get_mean_dEdx(T);
+
+    if (T>5260*units::MeV){ // only work for kaon ...
+      dEdx_mean_ioniz = dEdx_mean_dEdx * 1.047;
+      dEdx_mean_total = dEdx_mean_dEdx * 1.047;
+    }
+    
     L += 0.3*units::mm;
     T -= 0.3*units::mm * dEdx_mean_total;
     if (counter%5==0)
