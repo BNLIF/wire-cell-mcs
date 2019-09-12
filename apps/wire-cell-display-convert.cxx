@@ -171,6 +171,7 @@ int main(int argc, char* argv[])
   Double_t x1,y1,z1;
   Double_t dQ1,dx1,ndf;
   Double_t pu, pv, pw, pt;
+
   T_rec->SetBranchAddress("x",&x1);
   T_rec->SetBranchAddress("y",&y1);
   T_rec->SetBranchAddress("z",&z1);
@@ -181,7 +182,11 @@ int main(int argc, char* argv[])
   T_rec->SetBranchAddress("pv",&pv);
   T_rec->SetBranchAddress("pw",&pw);
   T_rec->SetBranchAddress("pt",&pt);
-  
+
+  Double_t reduced_chi2;
+  if (T_rec->GetBranch("reduced_chi2")){
+    T_rec->SetBranchAddress("reduced_chi2",&reduced_chi2);
+  }
   
   TTree *t1 = new TTree("T_rec","T_rec");
   t1->SetDirectory(file);
@@ -225,6 +230,7 @@ int main(int argc, char* argv[])
   std::vector<std::vector<double> > *L = new std::vector<std::vector<double> >;
   std::vector<std::vector<double> > *dtheta = new std::vector<std::vector<double> >;
 
+  std::vector<std::vector<double> > *Vreduced_chi2 = new std::vector<std::vector<double> > ;
 
   
   t1->Branch("rec_x",&x2);
@@ -238,6 +244,9 @@ int main(int argc, char* argv[])
   t1->Branch("rec_v",&rec_pv);
   t1->Branch("rec_w",&rec_pw);
   t1->Branch("rec_t",&rec_pt);
+  if (T_rec->GetBranch("reduced_chi2")){
+    t1->Branch("reduced_chi2",&Vreduced_chi2);
+  }
   
   
   if (file_type==1){
@@ -299,6 +308,10 @@ int main(int argc, char* argv[])
       std::vector<double> temp_L;
       L->push_back(temp_L);
 
+      if (T_rec->GetBranch("reduced_chi2")){
+	std::vector<double> temp_reduced_chi2;
+	Vreduced_chi2->push_back(temp_reduced_chi2);
+      }
       
       max_dis->push_back(0);
       total_dis2->push_back(0);
@@ -370,7 +383,9 @@ int main(int argc, char* argv[])
     dx->back().push_back(dx1);
     L->back().push_back(total_L->back());
     
-    
+    if (T_rec->GetBranch("reduced_chi2")){
+      Vreduced_chi2->back().push_back(reduced_chi2);
+    }
   
 
     prev_x1 = x1;
