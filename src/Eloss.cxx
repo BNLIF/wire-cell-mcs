@@ -1,13 +1,13 @@
-#include "WireCellMCSSim/Eloss.h"
+#include "WCPMCSSim/Eloss.h"
 
 #include "TF1.h"
 
 #include <fstream>
 #include <iostream>
 
-using namespace WireCell;
+using namespace WCP;
 
-double WireCell::Eloss::Density(double temperature){
+double WCP::Eloss::Density(double temperature){
    // temperature is assumed to be in degrees Kelvin
     // density is nearly a linear function of temperature.  see the NIST tables for details
     // slope is between -6.2 and -6.1, intercept is 1928 kg/m^3
@@ -19,7 +19,7 @@ double WireCell::Eloss::Density(double temperature){
 
 
 
-WireCell::Eloss::Eloss(int flag, TString filename)
+WCP::Eloss::Eloss(int flag, TString filename)
   : flag(flag)
   , mass_p(938.272*units::MeV)
   , fTemperature(87.8*units::kelvin)
@@ -99,18 +99,18 @@ WireCell::Eloss::Eloss(int flag, TString filename)
   
 }
 
-WireCell::Eloss::~Eloss(){
+WCP::Eloss::~Eloss(){
   delete g1;
   delete g2;
 }
 
-double WireCell::Eloss::get_mom(double T){
+double WCP::Eloss::get_mom(double T){
   double totE = T + mass;
   double mom = sqrt(pow(totE,2)-pow(mass,2));
   return mom;
 }
 
-double WireCell::Eloss::get_kepa(double T, double dx){
+double WCP::Eloss::get_kepa(double T, double dx){
   double totE = T + mass;
   double mom = sqrt(pow(totE,2)-pow(mass,2));
   
@@ -126,7 +126,7 @@ double WireCell::Eloss::get_kepa(double T, double dx){
   return kepa;
 }
 
-double WireCell::Eloss::get_mcs_angle(double T, double dx){
+double WCP::Eloss::get_mcs_angle(double T, double dx){
   double totE = T + mass;
   double mom = sqrt(pow(totE,2)-pow(mass,2));
   
@@ -140,7 +140,7 @@ double WireCell::Eloss::get_mcs_angle(double T, double dx){
 }
 
 
-double WireCell::Eloss::get_dEdx(double T, double dx){
+double WCP::Eloss::get_dEdx(double T, double dx){
   double totE = T + mass;
   double mom = sqrt(pow(totE,2)-pow(mass,2));
   
@@ -186,7 +186,7 @@ double WireCell::Eloss::get_dEdx(double T, double dx){
 }
 
 
-double WireCell::Eloss::get_MPV_dEdx(double T, double dx){
+double WCP::Eloss::get_MPV_dEdx(double T, double dx){
   double totE = T + mass;
   double mom = sqrt(pow(totE,2)-pow(mass,2));
   
@@ -212,7 +212,7 @@ double WireCell::Eloss::get_MPV_dEdx(double T, double dx){
   return (psi * coef/dx);
 }
 
-double WireCell::Eloss::get_mean_dEdx(double T, double tcut){
+double WCP::Eloss::get_mean_dEdx(double T, double tcut){
   double totE = T + mass;
   double mom = sqrt(pow(totE,2)-pow(mass,2));
 
@@ -247,13 +247,13 @@ double WireCell::Eloss::get_mean_dEdx(double T, double tcut){
 }
 
 
-double WireCell::Eloss::get_mean_ioniz_dEdx(double T){
+double WCP::Eloss::get_mean_ioniz_dEdx(double T){
   if (T > TE.at(TE.size()-1))
     T = TE.at(TE.size()-1);
   return g1->Eval(T);
 }
 
-double WireCell::Eloss::get_mean_total_dEdx(double T){
+double WCP::Eloss::get_mean_total_dEdx(double T){
   if (T > TE.at(TE.size()-1))
     T = TE.at(TE.size()-1);
   return g2->Eval(T);

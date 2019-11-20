@@ -1,19 +1,19 @@
-#include "WireCellMCSSim/MCSSim.h"
-#include "WireCellMCSSim/Eloss.h"
-#include "WireCellData/LAr.h"
+#include "WCPMCSSim/MCSSim.h"
+#include "WCPMCSSim/Eloss.h"
+#include "WCPData/LAr.h"
 
 #include <iostream>
 
-using namespace WireCell;
+using namespace WCP;
 
 using namespace MCS;
 
-void WireCell::MCS::RotateUz(TVector3& direction, TVector3& v1){
+void WCP::MCS::RotateUz(TVector3& direction, TVector3& v1){
   TVector3 unit = direction.Unit();
   v1.RotateUz(unit); 
 }
 
-void WireCell::MCS::LineToyTrackSim(MCStrack& atrack, TVector3 pos_init, TVector3 dir_init, int nstep, double step_size, int charge){
+void WCP::MCS::LineToyTrackSim(MCStrack& atrack, TVector3 pos_init, TVector3 dir_init, int nstep, double step_size, int charge){
 
   dir_init = dir_init.Unit();
   
@@ -38,7 +38,7 @@ void WireCell::MCS::LineToyTrackSim(MCStrack& atrack, TVector3 pos_init, TVector
 }
 
 
-void WireCell::MCS::LineTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
+void WCP::MCS::LineTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
   Eloss cal_loss(particle_type); // only for other particles ...
   LAr lar;
 
@@ -76,7 +76,7 @@ void WireCell::MCS::LineTrackSim(MCStrack& atrack, int particle_type, double T_i
   std::cout << atrack.N << std::endl;
 }
 
-void WireCell::MCS::MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
+void WCP::MCS::MCSTrackSim(MCStrack& atrack, int particle_type, double T_init, TVector3 pos_init, TVector3 dir_init, double step_size){
   Eloss cal_loss(particle_type); // only for other particles ...
 
   LAr lar;
@@ -150,7 +150,7 @@ void WireCell::MCS::MCSTrackSim(MCStrack& atrack, int particle_type, double T_in
 }
 
    
-void WireCell::MCS::MultiScattSim(MCStrack& atrack, int N, std::vector<double> initpos, std::vector<double> initdir){
+void WCP::MCS::MultiScattSim(MCStrack& atrack, int N, std::vector<double> initpos, std::vector<double> initdir){
   atrack.clear();
   double x=0;
   double y=0;

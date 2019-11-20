@@ -1,13 +1,13 @@
 #ifndef WIRECELL_ELOSS_H
 #define WIRECELL_ELOSS_H
 
-#include "WireCellData/Units.h"
+#include "WCPData/Units.h"
 
 #include "TString.h"
 #include "TGraph.h"
 #include "TRandom.h"
 
-namespace WireCell {
+namespace WCP {
   class Eloss {
   public:
     Eloss(int flag, TString filename = "input_data_files/proton_argon.dat");

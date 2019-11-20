@@ -1,5 +1,5 @@
-#include "WireCellMCSSim/Eloss.h"
-#include "WireCellData/LAr.h"
+#include "WCPMCSSim/Eloss.h"
+#include "WCPData/LAr.h"
 
 #include "TFile.h"
 #include "TTree.h"
@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-using namespace WireCell;
+using namespace WCP;
 using namespace std;
 
 

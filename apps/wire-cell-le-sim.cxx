@@ -11,10 +11,10 @@
 #include "TFile.h"
 #include "TVector3.h"
 
-#include "WireCellMCSSim/MCSSim.h"
+#include "WCPMCSSim/MCSSim.h"
 
 
-using namespace WireCell;
+using namespace WCP;
 
 using namespace MCS;
 

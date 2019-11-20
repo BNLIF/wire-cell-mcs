@@ -1,5 +1,5 @@
 
-#include "WireCellData/ToyPointCloud.h"
+#include "WCPData/ToyPointCloud.h"
 
 #include <iostream>
 #include <vector>
@@ -15,7 +15,7 @@
 
 #include <map>
 
-using namespace WireCell;
+using namespace WCP;
 
 int main(int argc, char* argv[])
 {
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 
   ToyPointCloud pcloud, pcloud1;
 
-  WireCell::PointVector ps;
+  WCP::PointVector ps;
   
   if (file_type==1){ // MC ... 
     for (size_t i=0;i!=x->size();i++){

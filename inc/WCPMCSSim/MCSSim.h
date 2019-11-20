@@ -1,13 +1,13 @@
 #ifndef WIRECELL_MCSSIM_H
 #define WIRECELL_MCSSIM_H
 
-#include "WireCellData/Units.h"
+#include "WCPData/Units.h"
 #include "TVector3.h"
 #include "TRandom.h"
 
 #include <vector>
 
-namespace WireCell {
+namespace WCP {
   namespace MCS{
     struct MCStrack{
       int N; // number of vertices 
