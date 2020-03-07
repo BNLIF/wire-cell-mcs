@@ -173,7 +173,7 @@ double WCP::Eloss::get_dEdx(double T, double dx){
     TF1 f1("f1","TMath::Vavilov(x,[0],[1])",-5,40);
     f1.SetParameter(0,kepa);
     f1.SetParameter(1,beta*beta);
-    double lambda = f1.GetRandom();
+    double lambda = f1.GetRandom(); // GSL Error?
     dEdx = cosi*(lambda+log(kepa) + gammap + beta*beta)/dx + dEdx_ave;
   }else if (kepa >=10){
     // Gaussian distribution
