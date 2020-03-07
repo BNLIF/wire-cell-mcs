@@ -187,6 +187,13 @@ int main(int argc, char* argv[])
   if (T_rec->GetBranch("reduced_chi2")){
     T_rec->SetBranchAddress("reduced_chi2",&reduced_chi2);
   }
+  Int_t flag_vertex;
+  Int_t sub_cluster_id;
+  if (T_rec->GetBranch("flag_vertex")){
+    T_rec->SetBranchAddress("flag_vertex",&flag_vertex);
+    T_rec->SetBranchAddress("sub_cluster_id",&sub_cluster_id);
+  }
+  
   
   TTree *t1 = new TTree("T_rec","T_rec");
   t1->SetDirectory(file);
@@ -231,6 +238,9 @@ int main(int argc, char* argv[])
   std::vector<std::vector<double> > *dtheta = new std::vector<std::vector<double> >;
 
   std::vector<std::vector<double> > *Vreduced_chi2 = new std::vector<std::vector<double> > ;
+  std::vector<std::vector<int> > *Vflag_vertex = new std::vector<std::vector<int> >;
+  std::vector<std::vector<int> > *Vsub_cluster_id = new std::vector<std::vector<int> >;
+  
 
   
   t1->Branch("rec_x",&x2);
@@ -247,7 +257,10 @@ int main(int argc, char* argv[])
   if (T_rec->GetBranch("reduced_chi2")){
     t1->Branch("reduced_chi2",&Vreduced_chi2);
   }
-  
+  if (T_rec->GetBranch("flag_vertex")){
+    t1->Branch("flag_vertex",&Vflag_vertex);
+    t1->Branch("sub_cluster_id",&Vsub_cluster_id);
+  }
   
   if (file_type==1){
     t1->Branch("true_dQ",&dQ_tru);
@@ -311,6 +324,12 @@ int main(int argc, char* argv[])
       if (T_rec->GetBranch("reduced_chi2")){
 	std::vector<double> temp_reduced_chi2;
 	Vreduced_chi2->push_back(temp_reduced_chi2);
+      }
+      if (T_rec->GetBranch("flag_vertex")){
+	std::vector<int> temp_flag_vertex;
+	std::vector<int> temp_sub_cluster_id;
+	Vflag_vertex->push_back(temp_flag_vertex);
+	Vsub_cluster_id->push_back(temp_sub_cluster_id);
       }
       
       max_dis->push_back(0);
@@ -385,6 +404,10 @@ int main(int argc, char* argv[])
     
     if (T_rec->GetBranch("reduced_chi2")){
       Vreduced_chi2->back().push_back(reduced_chi2);
+    }
+    if (T_rec->GetBranch("flag_vertex")){
+      Vflag_vertex->back().push_back(flag_vertex);
+      Vsub_cluster_id->back().push_back(sub_cluster_id);
     }
   
 
