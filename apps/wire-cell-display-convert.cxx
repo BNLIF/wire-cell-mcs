@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
     rec_pv->back().push_back(pv);
     rec_pw->back().push_back(pw);
     rec_pt->back().push_back(pt);
-    dQ_rec->back().push_back(dQ1);
+    dQ_rec->back().push_back(dQ1*10); // hack ...
     dx->back().push_back(dx1);
     L->back().push_back(total_L->back());
     
