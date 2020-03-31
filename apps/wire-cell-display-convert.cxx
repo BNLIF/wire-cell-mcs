@@ -68,6 +68,17 @@ int main(int argc, char* argv[])
   TFile *file1 = new TFile(reco_filename);
   TTree *T_bad_ch = (TTree*)file1->Get("T_bad_ch");
    
+  Double_t dQdx_scale = 1;
+  Double_t dQdx_offset = 0;
+  TTree *Trun = (TTree*)file1->Get("Trun");
+  if (Trun!=0){
+    if (Trun->GetBranch("dQdx_scale")){
+      Trun->SetBranchAddress("dQdx_scale",&dQdx_scale);
+      Trun->SetBranchAddress("dQdx_offset",&dQdx_offset);
+      Trun->GetEntry(0);
+    }
+  }
+  // std::cout << dQdx_scale << " " << dQdx_offset << std::endl;
   
   TFile *file = new TFile(out_filename,"RECREATE");
   if (T_bad_ch!=0){
@@ -398,7 +409,7 @@ int main(int argc, char* argv[])
     rec_pv->back().push_back(pv);
     rec_pw->back().push_back(pw);
     rec_pt->back().push_back(pt);
-    dQ_rec->back().push_back(dQ1*10); // hack ...
+    dQ_rec->back().push_back((dQ1-dQdx_offset)/dQdx_scale); // hack to match the color scale
     dx->back().push_back(dx1);
     L->back().push_back(total_L->back());
     
