@@ -48,7 +48,7 @@ WCP::Eloss::Eloss(int flag, TString filename)
       lifetime = 1.238e-8*units::second; //sec
     }else if (flag==3){ // muon+-
       mass = 105.658*units::MeV;
-      lifetime = 2.2-6*units::second; // sec
+      lifetime = 2.2e-6*units::second; // sec
     }else if (flag==4){
       mass = 938.272 * units::MeV; // proton
       lifetime = 100000.*units::second; //sec
