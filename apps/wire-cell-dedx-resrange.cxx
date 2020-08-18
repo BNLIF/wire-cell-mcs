@@ -101,8 +101,8 @@ int main(int argc, char* argv[]){
       // std::cout << "T[MeV]: " << T/units::MeV << " dEdx_mean: " << dEdx_mean_dEdx << std::endl;
       // hdedx_T->Fill(T/units::GeV, dEdx_mean_dEdx/(units::MeV/units::cm));
 
-      // double eloss = step_size*loss.get_dEdx(T, step_size);
-      double eloss = step_size*dEdx_mean_dEdx;
+      double eloss = step_size*loss.get_dEdx(T, step_size);
+      // double eloss = step_size*dEdx_mean_dEdx;
 
 
       if (T>eloss) {
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]){
     for(auto dE: edeps) {
       double dEdx = dE/step_size;
       double dEdx_mpv = loss.get_MPV_dEdx(Tcollection.at(istep), step_size);
-      double dEdx_mean = loss.get_mean_dEdx(Tcollection.at(istep));
+      double dEdx_mean = loss.get_mean_dEdx(Tcollection.at(istep)); // get_mean_total_dEdx if input file is given
       istep ++;
       double res_range = total_length - step_size*istep;
       hdedx_resrange->Fill(res_range/units::cm, dEdx/(units::MeV/units::cm));
